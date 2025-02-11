@@ -3,7 +3,6 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import Header from './components/Header';
-import LoginSection from './components/LoginSection';
 import Loading from './components/Loading';
 import HeroSection from './components/HeroSection';
 import ConsumptionAnalysis from './components/ConsumptionAnalysis';
@@ -13,6 +12,9 @@ import Footer from './components/Footer';
 export default function HomePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [userInfo, setUserInfo] = useState(null);
+  const [childAge, setChildAge] = useState(null);
+  const [monthlySpending, setMonthlySpending] = useState(0);
 
   useEffect(() => {
     setLoading(false);
@@ -27,6 +29,73 @@ export default function HomePage() {
       // URL 파라미터 제거
       window.history.replaceState({}, document.title, '/');
     }
+
+    const fetchData = async () => {
+      const userData = localStorage.getItem('user');
+      const accessToken = localStorage.getItem('access_token');
+
+      if (userData && accessToken) {
+        const parsedUser = JSON.parse(userData);
+        setUserInfo(parsedUser);
+
+        // 아기의 개월 수 계산
+        if (parsedUser.children && parsedUser.children[0]) {
+          const birthDate = new Date(parsedUser.children[0].birthdate);
+          const today = new Date();
+          const monthDiff =
+            (today.getFullYear() - birthDate.getFullYear()) * 12 +
+            (today.getMonth() - birthDate.getMonth());
+          setChildAge(monthDiff);
+        }
+
+        // 지출 내역 조회 및 현재 월 지출액 계산
+        try {
+          const response = await fetch(
+            'http://localhost:3005/budget/spending',
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            }
+          );
+
+          if (response.ok) {
+            const spendingData = await response.json();
+
+            // 현재 년월 구하기
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth();
+
+            // 현재 월의 지출액만 필터링하여 합산
+            let currentMonthTotal = 0;
+            spendingData.spending.forEach((category) => {
+              if (category.details && Array.isArray(category.details)) {
+                category.details.forEach((detail) => {
+                  const spendingDate = new Date(detail.date);
+                  if (
+                    spendingDate.getFullYear() === currentYear &&
+                    spendingDate.getMonth() === currentMonth
+                  ) {
+                    currentMonthTotal += detail.amount;
+                  }
+                });
+              }
+            });
+
+            setMonthlySpending(currentMonthTotal);
+          } else {
+            console.warn('지출 내역을 가져오는데 실패했습니다.');
+            setMonthlySpending(0);
+          }
+        } catch (error) {
+          console.error('Error fetching spending:', error);
+          setMonthlySpending(0);
+        }
+      }
+    };
+
+    fetchData();
   }, []);
 
   const handleGoogleSuccess = async (credentialResponse) => {
@@ -76,7 +145,11 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-100">
       <Header onLogin={handleGoogleSuccess} />
-      <HeroSection />
+      <HeroSection
+        userInfo={userInfo}
+        childAge={childAge}
+        monthlySpending={monthlySpending}
+      />
       <ConsumptionAnalysis />
       <ProductRecommendations />
       <Footer />

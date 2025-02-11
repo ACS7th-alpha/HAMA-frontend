@@ -115,7 +115,35 @@ export default function SignupPage() {
         console.log('로컬 스토리지 저장 완료');
         console.log('메인 페이지로 이동 중...');
 
-        // 메인 페이지로 이동
+        // 2. 초기 예산 설정 요청
+        try {
+          const budgetResponse = await fetch('http://localhost:3005/budget', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${data.access_token}`,
+            },
+            body: JSON.stringify({
+              diaperBudget: 0,
+              sanitaryBudget: 0,
+              feedingBudget: 0,
+              skincareBudget: 0,
+              foodBudget: 0,
+              toysBudget: 0,
+              beddingBudget: 0,
+              fashionBudget: 0,
+              otherBudget: 0,
+            }),
+          });
+
+          if (!budgetResponse.ok) {
+            console.warn('초기 예산 설정 실패:', await budgetResponse.text());
+          }
+        } catch (error) {
+          console.error('초기 예산 설정 중 오류:', error);
+        }
+
+        // 3. 메인 페이지로 이동
         router.push('/');
       } else {
         console.error('=== 회원가입 실패 ===');
