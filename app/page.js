@@ -156,6 +156,33 @@ export default function HomePage() {
     }
   };
 
+  const handleGoToStatistics = async () => {
+    setLoading(true);
+    const accessToken = localStorage.getItem('access_token');
+
+    try {
+      const response = await fetch('http://localhost:3005/budget/spending', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // 데이터를 로컬 스토리지에 저장
+        localStorage.setItem('spendingData', JSON.stringify(data));
+        // 통계 페이지로 이동
+        router.push('/statistics');
+      } else {
+        console.error('Failed to fetch spending data');
+      }
+    } catch (error) {
+      console.error('Error fetching spending data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -171,6 +198,7 @@ export default function HomePage() {
       <ConsumptionAnalysis />
       <ProductRecommendations />
       <Footer />
+      <button onClick={handleGoToStatistics}>지출 통계 보기</button>
     </div>
   );
 }
