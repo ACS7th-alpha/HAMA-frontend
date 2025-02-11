@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Header from '@/app/components/header';
+import Header from '@/app/components/Header';
 import Link from 'next/link';
-import ItemCard from '@/app/components/itemCard';
-import ImageSlider from '@/app/components/imageslider';
+import ItemCard from '@/app/components/ItemCard';
+import ImageSlider from '@/app/components/ImageSlider';
 
 export default function ProductDetail({ params }) {
   const [product, setProduct] = useState(null);
