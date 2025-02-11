@@ -19,8 +19,7 @@ export default function BudgetPage() {
     { name: '기타', budget: 0 },
   ]);
 
-  // 임시로 사용중인 금액 데이터 (나중에 실제 데이터로 교체)
-  const [categorySpending] = useState({
+  const [categorySpending, setCategorySpending] = useState({
     '기저귀/물티슈': 0,
     '생활/위생용품': 0,
     '수유/이유용품': 0,
@@ -33,11 +32,14 @@ export default function BudgetPage() {
   });
 
   const calculatePercentage = (spent, budget) => {
+    // 예산이 0이고 지출이 있는 경우 100% 표시
+    if (budget === 0 && spent > 0) return 100;
+    // 예산이 0이고 지출도 0인 경우 0% 표시
     if (budget === 0) return 0;
+    // 일반적인 경우 퍼센트 계산
     return (spent / budget) * 100;
   };
 
-  // 현재 예산 데이터 불러오기
   const fetchBudgetData = async () => {
     try {
       const accessToken = localStorage.getItem('access_token');
@@ -48,17 +50,15 @@ export default function BudgetPage() {
         },
       });
 
-      if (response.status === 404) {
-        console.warn('예산 데이터가 없습니다.'); // 404 오류 처리
-        return; // 예산 데이터가 없으면 그냥 리턴
-      }
-
       if (!response.ok) {
         throw new Error('예산 데이터를 불러오는 데 실패했습니다.');
       }
 
       const data = await response.json();
       console.log('받아온 예산 데이터:', data);
+
+      // 로컬 스토리지에 저장
+      localStorage.setItem('budget', JSON.stringify(data));
 
       // 카테고리 예산 업데이트
       const newCategories = [
@@ -79,6 +79,49 @@ export default function BudgetPage() {
     }
   };
 
+  const fetchMonthlySpending = async () => {
+    try {
+      const accessToken = localStorage.getItem('access_token');
+      const response = await fetch('http://localhost:3005/budget/spending', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+
+        // 현재 월의 총 지출액 계산
+        let monthTotal = 0;
+        const categorySums = {};
+
+        data.spending.forEach((category) => {
+          if (category.details && Array.isArray(category.details)) {
+            category.details.forEach((detail) => {
+              const spendingDate = new Date(detail.date);
+              if (
+                spendingDate.getFullYear() === year &&
+                spendingDate.getMonth() === month
+              ) {
+                monthTotal += detail.amount;
+                const categoryName = getCategoryName(category.category);
+                categorySums[categoryName] =
+                  (categorySums[categoryName] || 0) + detail.amount;
+              }
+            });
+          }
+        });
+
+        setCurrentSpending(monthTotal);
+        setCategorySpending(categorySums);
+      }
+    } catch (error) {
+      console.error('Error fetching spending data:', error);
+    }
+  };
+
   useEffect(() => {
     // 사용자 정보와 당월 예산 설정
     const userStr = localStorage.getItem('user');
@@ -92,6 +135,27 @@ export default function BudgetPage() {
     fetchBudgetData();
     setLoading(false);
   }, []); // 컴포넌트 마운트 시에만 실행
+
+  // 현재 월의 지출 데이터 계산
+  useEffect(() => {
+    fetchMonthlySpending();
+  }, [currentDate]); // currentDate가 변경될 때마다 실행
+
+  // 카테고리 이름 변환 함수
+  const getCategoryName = (category) => {
+    const categoryMap = {
+      diaper: '기저귀/물티슈',
+      sanitary: '생활/위생용품',
+      feeding: '수유/이유용품',
+      skincare: '스킨케어/화장품',
+      food: '식품',
+      toys: '완구용품',
+      bedding: '침구류',
+      fashion: '패션의류/잡화',
+      other: '기타',
+    };
+    return categoryMap[category] || category;
+  };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -107,6 +171,7 @@ export default function BudgetPage() {
       return newDate;
     });
     fetchBudgetData(); // 월 변경 시 예산 데이터 다시 불러오기
+    fetchMonthlySpending(); // 월 변경 시 지출 데이터 다시 불러오기
   };
 
   const handleNextMonth = () => {
@@ -116,6 +181,7 @@ export default function BudgetPage() {
       return newDate;
     });
     fetchBudgetData(); // 월 변경 시 예산 데이터 다시 불러오기
+    fetchMonthlySpending(); // 월 변경 시 지출 데이터 다시 불러오기
   };
 
   const handleBudgetChange = (index, value) => {
@@ -194,29 +260,6 @@ export default function BudgetPage() {
           Number(categories.find((cat) => cat.name === '기타')?.budget) || 0,
       };
 
-      // 총 예산 계산 (프론트엔드 검증용)
-      const totalBudget =
-        budgetData.diaperBudget +
-        budgetData.sanitaryBudget +
-        budgetData.feedingBudget +
-        budgetData.skincareBudget +
-        budgetData.foodBudget +
-        budgetData.toysBudget +
-        budgetData.beddingBudget +
-        budgetData.fashionBudget +
-        budgetData.otherBudget;
-
-      console.log('Monthly Budget:', monthlyBudget);
-      console.log('Total Budget:', totalBudget);
-      console.log('Budget Data to send:', budgetData);
-
-      if (totalBudget > monthlyBudget) {
-        alert(
-          `카테고리별 예산의 총액(${totalBudget.toLocaleString()}원)이 월별 총 예산(${monthlyBudget.toLocaleString()}원)을 초과할 수 없습니다.`
-        );
-        return;
-      }
-
       const response = await fetch('http://localhost:3005/budget', {
         method: 'POST',
         headers: {
@@ -224,14 +267,11 @@ export default function BudgetPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
-        credentials: 'omit',
-        mode: 'cors',
         body: JSON.stringify(budgetData),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Server error response:', errorData);
         throw new Error(errorData?.message || '예산 저장에 실패했습니다.');
       }
 
@@ -251,12 +291,48 @@ export default function BudgetPage() {
         { name: '기타', budget: data.otherBudget },
       ];
 
+      // 카테고리 상태 업데이트
       setCategories(newCategories);
+
+      // 로컬 스토리지 업데이트
+      localStorage.setItem('budget', JSON.stringify(data));
+
       alert('예산이 성공적으로 저장되었습니다.');
     } catch (error) {
       console.error('Error details:', error);
       alert(`예산 저장 실패: ${error.message}`);
     }
+  };
+
+  // 카테고리별 게이지 바 컴포넌트
+  const CategoryBar = ({ category, budget, spending }) => {
+    const percentage = calculatePercentage(spending, budget);
+    // 예산이 0원이고 지출이 있는 경우 빨간색으로 표시
+    const barColor =
+      budget === 0 && spending > 0
+        ? 'bg-red-500'
+        : percentage > 100
+        ? 'bg-red-500'
+        : 'bg-blue-500';
+
+    return (
+      <div className="mb-4">
+        <div className="flex justify-between mb-1">
+          <span className="text-black">{category}</span>
+          <span className="text-black">
+            {spending.toLocaleString()}원
+            {budget > 0 ? ` / ${budget.toLocaleString()}원` : ''}
+            {budget > 0 ? ` (${percentage.toFixed(1)}%)` : ''}
+          </span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2.5">
+          <div
+            className={`h-2.5 rounded-full ${barColor} transition-all duration-300`}
+            style={{ width: `${Math.min(percentage, 100)}%` }}
+          ></div>
+        </div>
+      </div>
+    );
   };
 
   return (
