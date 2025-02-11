@@ -24,13 +24,13 @@ export default function Firstpage({ images = [], currentImage = 0 }) {
             <span className="text-yellow-400">HAMA</span>와 함께
             <span className="inline-block animate-bounce ml-2">🎈</span>
           </h1>
-          <p className="text-xl text-gray-700 mb-4">
+          <p className="text-xl text-gray-700 font-semibold mb-4">
             최저가 육아 용품 구매, 소비패턴 분석을 한 곳에서
             <span className="inline-block ml-2">✨</span>
           </p>
           <p className="max-w-2xl mx-auto text-gray-600 mb-10 leading-relaxed">
             온라인 쇼핑 예산, 아기 정보(생년월일, 성별)을 입력하면 
-            해당 조건에 맞는 최저가 육아 용품을 추천합니다. 
+            해당 조건에 맞는 최저가 육아 용품을 추천합니다.
             월별 소비 내역 및 카테고리별 지출 통계를 통해 
             육아 비용을 체계적으로 관리합니다.
           </p>
