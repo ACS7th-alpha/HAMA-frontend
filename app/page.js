@@ -118,10 +118,28 @@ export default function HomePage() {
       console.log('3. 백엔드 로그인 응답:', data);
 
       if (response.ok) {
+        // 1. 토큰 및 사용자 정보 저장
         localStorage.setItem('access_token', data.access_token);
         localStorage.setItem('refresh_token', data.refresh_token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        window.location.reload(); // 페이지 새로고침하여 헤더 상태 업데이트
+
+        // 2. 예산 데이터 가져오기
+        try {
+          const budgetResponse = await fetch('http://localhost:3005/budget', {
+            headers: {
+              Authorization: `Bearer ${data.access_token}`,
+            },
+          });
+
+          if (budgetResponse.ok) {
+            const budgetData = await budgetResponse.json();
+            localStorage.setItem('budget', JSON.stringify(budgetData));
+          }
+        } catch (error) {
+          console.error('예산 데이터 가져오기 실패:', error);
+        }
+
+        window.location.reload(); // 페이지 새로고침
       } else {
         const userData = {
           id: decoded.sub,
