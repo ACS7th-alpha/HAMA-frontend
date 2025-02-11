@@ -30,10 +30,10 @@ export default function ItemCard({ item }) {
               {new Date(item.createdAt).toLocaleDateString('ko-KR')}
             </span>
           </div>
-          <p className="font-semibold text-lg">{item.name}</p>
-          <p className="text-sm text-gray-600">{item.description}</p>
-          <p className="text-sm text-gray-600">사용 연령: {item.ageGroup}</p>
-          <p className="text-sm text-gray-600">
+          <p className="font-semibold text-xl">{item.name}</p>
+          <p className="text-l text-gray-600">{item.description}</p>
+          <p className="text-l text-gray-600">사용 연령: {item.ageGroup}</p>
+          <p className="text-l text-gray-600">
             구매처: {item.purchaseLink || '미기재'}
           </p>
         </div>
