@@ -178,20 +178,23 @@ export default function Header({ onLogin }) {
     window.location.href = '/';
   };
 
+
   return (
     <header className="bg-white shadow-md p-4 flex flex-col items-center">
       <div className="w-full flex justify-between items-center px-6">
         <Link href="/">
           <Image src="/hama_logo.jpg" alt="HAMA Logo" width={150} height={50} />
         </Link>
-
-        <input
-          type="text"
-          placeholder="어떤 상품을 찾으시나요?"
-          className="w-1/3 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-
+        
         <div className="flex justify-center">
+          <input
+            type="text"
+            placeholder="어떤 상품을 찾으시나요?"
+            className="w-full px-8 py-3 border-2 border-pink-100 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-lg placeholder-gray-400 shadow-sm transition-all duration-200"
+          />
+        </div>
+
+        <div className="flex items-center gap-4">
           {!isLoggedIn && onLogin && (
             <GoogleLogin
               onSuccess={(response) => {
@@ -216,12 +219,34 @@ export default function Header({ onLogin }) {
             />
           )}
           {isLoggedIn && (
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors"
-            >
-              로그아웃
-            </button>
+            <nav className="flex items-center gap-1">
+              {/* 장바구니 버튼 */}
+              <Link
+                href="/cart"
+                className="flex flex-col items-center gap-2 px-4 py-2 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
+              >
+                <span className="text-xl">🛒</span>
+                <span className="font-semibold">장바구니</span>
+              </Link>
+
+              {/* 마이페이지 버튼 */}
+              <Link
+                href="/mypage"
+                className="flex flex-col items-center gap-2 px-4 py-2 text-pink-600 rounded-lg hover:bg-pink-200 transition-colors"
+              >
+                <span className="text-xl">👤</span>
+                <span className="font-semibold">마이페이지</span>
+              </Link>
+
+              {/* 로그아웃 버튼 */}
+              <button
+                onClick={handleLogout}
+                className="flex flex-col items-center gap-2 px-4 py-2 bg-pink-100 text-red-600 rounded-lg font-semibold hover:bg-pink-200 transition-colors"
+              >
+                <span className="text-xl">🚪</span>
+                <span>로그아웃</span>
+              </button>
+            </nav>
           )}
         </div>
       </div>
@@ -230,25 +255,25 @@ export default function Header({ onLogin }) {
         <nav className="w-full flex justify-center space-x-6 text-lg font-medium mt-4 border-b pb-2">
           <Link
             href="/budget"
-            className="hover:underline text-black font-semibold"
+            className="hover:text-blue-600 hover:underline text-black transition-colors"
           >
             예산관리
           </Link>
           <Link
             href="/statistics"
-            className="hover:underline text-black font-semibold"
+            className="hover:text-blue-600 hover:underline text-black  transition-colors"
           >
             지출통계
           </Link>
           <Link
             href="/calendar"
-            className="hover:underline text-black font-semibold"
+            className="hover:text-blue-600 hover:underline text-black transition-colors"
           >
             지출달력
           </Link>
           <Link
             href="/community"
-            className="hover:underline text-black font-semibold"
+            className="hover:text-blue-600 hover:underline text-black transition-colors"
           >
             커뮤니티
           </Link>

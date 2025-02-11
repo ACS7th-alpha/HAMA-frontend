@@ -33,7 +33,7 @@ export default function UserDashboard({ userInfo, childAge }) {
                     <p className="text-gray-800 flex items-center text-lg">
                       <span className="mr-2">💰</span> 이번 달 예산
                     </p>
-                    <p className="text-3xl font-bold text-black mt-2">
+                    <p className="text-2xl font-bold text-black mt-2">
                       {userInfo.monthlyBudget?.toLocaleString()}원
                     </p>
                   </div>
