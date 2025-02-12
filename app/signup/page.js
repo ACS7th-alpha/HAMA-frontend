@@ -118,6 +118,10 @@ export default function SignupPage() {
 
         // 2. 초기 예산 설정 요청
         try {
+          const currentDate = new Date();
+          const year = currentDate.getFullYear(); // 현재 년도
+          const month = currentDate.getMonth() + 1; // 현재 월 (0부터 시작하므로 +1)
+
           const budgetResponse = await fetch('http://localhost:3005/budget', {
             method: 'POST',
             headers: {
@@ -125,15 +129,19 @@ export default function SignupPage() {
               Authorization: `Bearer ${data.access_token}`,
             },
             body: JSON.stringify({
-              diaperBudget: 0,
-              sanitaryBudget: 0,
-              feedingBudget: 0,
-              skincareBudget: 0,
-              foodBudget: 0,
-              toysBudget: 0,
-              beddingBudget: 0,
-              fashionBudget: 0,
-              otherBudget: 0,
+              year: year, // 현재 년도
+              month: month, // 현재 월
+              categories: {
+                diaper: 0,
+                sanitary: 0,
+                feeding: 0,
+                skincare: 0,
+                food: 0,
+                toys: 0,
+                bedding: 0,
+                fashion: 0,
+                other: 0,
+              },
             }),
           });
 
