@@ -313,12 +313,24 @@ export default function CalendarPage() {
     }
   };
 
-  // 날짜 클릭 핸들러
+  // 날짜 선택 핸들러 수정
   const handleDateClick = (day) => {
-    setSelectedDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
+    const selectedDateObj = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      day
     );
-    setSelectedDateSpending(dailySpending[day] || []);
+    setSelectedDate(selectedDateObj);
+
+    // 선택된 날짜의 지출 내역 필터링
+    const daySpending = dailySpending[day] || [];
+    setSelectedDateSpending(daySpending);
+
+    // 수정 모드 초기화
+    setSpendingToEdit(null);
+    setProductName('');
+    setSpendingAmount('');
+    setSelectedCategory('');
   };
 
   // 날짜 선택 핸들러
@@ -727,25 +739,62 @@ export default function CalendarPage() {
                               />
                             </td>
                             <td className="px-6 py-4 text-right">
-                              <button
-                                onClick={handleUpdateSpending}
-                                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition"
-                              >
-                                저장
-                              </button>
-                              <button
-                                onClick={handleCancelEdit}
-                                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition ml-2"
-                              >
-                                취소
-                              </button>
+                              <div className="flex justify-end mt-4">
+                                <button
+                                  type="submit"
+                                  className="inline-flex items-center px-4 py-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors duration-200 mr-2"
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 mr-1"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M5 13l4 4L19 7"
+                                    />
+                                  </svg>
+                                  저장하기
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    // 취소 동작 정의
+                                    setSpendingToEdit(null);
+                                    setProductName('');
+                                    setSpendingAmount('');
+                                    setSelectedCategory('');
+                                  }}
+                                  className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 transition-colors duration-200"
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 mr-1"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M6 18L18 6M6 6l12 12"
+                                    />
+                                  </svg>
+                                  취소
+                                </button>
+                              </div>
                             </td>
                           </>
                         ) : (
                           // 일반 모드
                           <>
                             <td className="px-6 py-4 text-black">
-                              {spending.date}
+                              {new Date(spending.date).toLocaleDateString()}
                             </td>
                             <td className="px-6 py-4 text-black">
                               {getCategoryName(spending.category)}
@@ -753,22 +802,50 @@ export default function CalendarPage() {
                             <td className="px-6 py-4 text-black">
                               {spending.itemName}
                             </td>
-                            <td className="px-6 py-4 text-right text-red-600">
-                              {spending.amount.toLocaleString()}원
+                            <td className="px-6 py-4 text-right text-black">
+                              {parseInt(spending.amount).toLocaleString()}원
                             </td>
                             <td className="px-6 py-4 text-right">
                               <button
                                 onClick={() => handleEditSpending(spending)}
-                                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+                                className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors duration-200 mr-2"
                               >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-4 w-4 mr-1"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                  />
+                                </svg>
                                 수정
                               </button>
                               <button
                                 onClick={() =>
                                   handleDeleteSpending(spending._id)
                                 }
-                                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition ml-2"
+                                className="inline-flex items-center px-3 py-1 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors duration-200"
                               >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-4 w-4 mr-1"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                  />
+                                </svg>
                                 삭제
                               </button>
                             </td>
@@ -968,9 +1045,50 @@ export default function CalendarPage() {
                 <div className="flex justify-end mt-4">
                   <button
                     type="submit"
-                    className="bg-green-500 text-white py-2 px-6 rounded-md hover:bg-green-600 transition duration-200"
+                    className="inline-flex items-center px-4 py-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors duration-200 mr-2"
                   >
-                    등록하기
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    저장하기
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // 취소 동작 정의
+                      setSpendingToEdit(null);
+                      setProductName('');
+                      setSpendingAmount('');
+                      setSelectedCategory('');
+                    }}
+                    className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 transition-colors duration-200"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                    취소
                   </button>
                 </div>
               </form>
