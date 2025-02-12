@@ -85,25 +85,46 @@ export default function MyPage() {
     if (!confirmDelete) return;
 
     try {
+      const accessToken = localStorage.getItem('access_token');
+
+      // 예산 삭제 요청
+      const budgetResponse = await fetch('http://localhost:3005/budget', {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (budgetResponse.status === 404) {
+        console.log('예산 데이터가 없습니다.'); // 예외 처리
+      } else if (!budgetResponse.ok) {
+        throw new Error('예산 삭제 실패');
+      } else {
+        console.log('예산 삭제 성공');
+      }
+
+      // 회원 탈퇴 요청
       const response = await fetch('http://localhost:3001/auth/delete', {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`, // 액세스 토큰 사용
+          Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
       });
 
       if (!response.ok) throw new Error('계정 삭제 실패');
 
-      // 계정 삭제 성공 시 localStorage에서 삭제 후 메인 페이지로 이동
-      localStorage.removeItem('user');
+      // 계정 삭제 성공 시 로컬 저장소 데이터 삭제 후 메인 페이지로 이동
+      localStorage.clear(); // 모든 로컬 저장소 데이터 삭제
       alert('계정이 삭제되었습니다.');
-      router.push('/');
+      router.push('/'); // 로그인 전의 메인 페이지로 이동
     } catch (error) {
       console.error('Error deleting account:', error);
       alert('계정 삭제 중 오류가 발생했습니다.');
     }
   };
+
 
   if (!userInfo) {
     return (
@@ -161,6 +182,7 @@ export default function MyPage() {
             }`}
           >
             자녀 정보
+          </button>
           </button>
           <button
             onClick={() => setActiveTab('posts')}
@@ -321,6 +343,21 @@ export default function MyPage() {
               <h2 className="text-2xl font-bold text-gray-800 mb-8">
                 설정 <span className="ml-2">⚙️</span>
               </h2>
+              <div className="flex items-center justify-between p-8 bg-gray-50 rounded-lg">
+                <div>
+                  <h3 className="text-xl font-semibold">계정 삭제</h3>
+                  <p className="text-l text-gray-600">
+                    회원 탈퇴 및 데이터 삭제
+                  </p>
+                </div>
+                <button
+                  onClick={handleDeleteAccount}
+                  className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+                >
+                  탈퇴하기
+                </button>
+              </div>
+            </div>
               <div className="flex items-center justify-between p-8 bg-gray-50 rounded-lg">
                 <div>
                   <h3 className="text-xl font-semibold">계정 삭제</h3>
