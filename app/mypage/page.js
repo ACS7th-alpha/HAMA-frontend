@@ -7,7 +7,7 @@ import Header from '@/app/components/Header';
 export default function MyPage() {
   const router = useRouter();
   const [userInfo, setUserInfo] = useState(null);
-  const [activeTab, setActiveTab] = useState('profile'); // 'profile', 'children', 'settings'
+  const [activeTab, setActiveTab] = useState('profile');
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
