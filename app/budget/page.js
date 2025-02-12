@@ -49,6 +49,25 @@ export default function BudgetPage() {
         },
       });
 
+      // 404 에러(데이터 없음) 처리
+      if (response.status === 404) {
+        console.log('No budget data found');
+        // 기본 카테고리 구조로 초기화
+        const defaultCategories = [
+          { name: '기저귀/물티슈', budget: 0 },
+          { name: '생활/위생용품', budget: 0 },
+          { name: '수유/이유용품', budget: 0 },
+          { name: '스킨케어/화장품', budget: 0 },
+          { name: '식품', budget: 0 },
+          { name: '완구용품', budget: 0 },
+          { name: '침구류', budget: 0 },
+          { name: '패션의류/잡화', budget: 0 },
+          { name: '기타', budget: 0 },
+        ];
+        setCategories(defaultCategories);
+        return;
+      }
+
       if (!response.ok) {
         throw new Error('Failed to fetch budget data');
       }
@@ -119,7 +138,19 @@ export default function BudgetPage() {
       }
     } catch (error) {
       console.error('Error fetching budget data:', error);
-      alert(error.message);
+      // 에러 발생 시에도 기본 카테고리로 초기화
+      const defaultCategories = [
+        { name: '기저귀/물티슈', budget: 0 },
+        { name: '생활/위생용품', budget: 0 },
+        { name: '수유/이유용품', budget: 0 },
+        { name: '스킨케어/화장품', budget: 0 },
+        { name: '식품', budget: 0 },
+        { name: '완구용품', budget: 0 },
+        { name: '침구류', budget: 0 },
+        { name: '패션의류/잡화', budget: 0 },
+        { name: '기타', budget: 0 },
+      ];
+      setCategories(defaultCategories);
     }
   };
 
@@ -172,7 +203,6 @@ export default function BudgetPage() {
     if (userStr) {
       const user = JSON.parse(userStr);
       setMonthlyBudget(user.monthlyBudget || 0);
-      setCurrentSpending(5); // 임시 데이터
     }
 
     // 현재 예산 데이터 불러오기

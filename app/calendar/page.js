@@ -23,12 +23,11 @@ export default function CalendarPage() {
   useEffect(() => {
     const fetchAllSpending = async () => {
       try {
-        setLoading(true);
         const accessToken = localStorage.getItem('access_token');
-        const userStr = localStorage.getItem('user');
-        if (userStr) {
-          const user = JSON.parse(userStr);
-          setMonthlyBudget(user.monthlyBudget || 0);
+        if (!accessToken) {
+          console.log('No access token found');
+          setLoading(false);
+          return;
         }
 
         const response = await fetch('http://localhost:3005/budget/spending', {
@@ -37,12 +36,25 @@ export default function CalendarPage() {
           },
         });
 
-        if (response.ok) {
-          const data = await response.json();
+        if (response.status === 404) {
+          // 데이터가 없는 경우 정상적으로 처리
+          console.log('No spending data found');
+          setAllSpending([]);
+          setLoading(false);
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch spending data');
+        }
+
+        const data = await response.json();
+        if (data) {
           setAllSpending(data.spending || []); // 전체 지출 내역 저장
         }
       } catch (error) {
         console.error('Error fetching spending data:', error);
+        setAllSpending([]); // 에러 발생 시 빈 배열로 초기화
       } finally {
         setLoading(false);
       }
@@ -332,6 +344,8 @@ export default function CalendarPage() {
     );
   };
 
+  const user = JSON.parse(localStorage.getItem('user')); // 로컬 저장소에서 사용자 데이터 가져오기
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -391,7 +405,7 @@ export default function CalendarPage() {
             <div className="bg-white p-6 rounded-lg shadow">
               <h3 className="text-lg font-semibold mb-2 text-black">예산</h3>
               <p className="text-2xl font-bold text-blue-600">
-                {monthlyBudget?.toLocaleString()}원
+                {user?.monthlyBudget?.toLocaleString() || 0}원
               </p>
             </div>
             <div className="bg-white p-6 rounded-lg shadow">

@@ -122,7 +122,8 @@ export default function HomePage() {
         localStorage.setItem('access_token', data.access_token);
         localStorage.setItem('refresh_token', data.refresh_token);
         localStorage.setItem('user', JSON.stringify(data.user));
-
+        localStorage.removeItem('spendingData');
+        localStorage.removeItem('budget');
         // 2. 예산 데이터 가져오기
         try {
           const budgetResponse = await fetch('http://localhost:3005/budget', {
