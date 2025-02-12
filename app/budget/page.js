@@ -44,38 +44,113 @@ export default function BudgetPage() {
     try {
       const accessToken = localStorage.getItem('access_token');
       const response = await fetch('http://localhost:3005/budget', {
-        method: 'GET',
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
 
+      // 404 에러(데이터 없음) 처리
+      if (response.status === 404) {
+        console.log('No budget data found');
+        // 기본 카테고리 구조로 초기화
+        const defaultCategories = [
+          { name: '기저귀/물티슈', budget: 0 },
+          { name: '생활/위생용품', budget: 0 },
+          { name: '수유/이유용품', budget: 0 },
+          { name: '스킨케어/화장품', budget: 0 },
+          { name: '식품', budget: 0 },
+          { name: '완구용품', budget: 0 },
+          { name: '침구류', budget: 0 },
+          { name: '패션의류/잡화', budget: 0 },
+          { name: '기타', budget: 0 },
+        ];
+        setCategories(defaultCategories);
+        return;
+      }
+
       if (!response.ok) {
-        throw new Error('예산 데이터를 불러오는 데 실패했습니다.');
+        throw new Error('Failed to fetch budget data');
       }
 
       const data = await response.json();
-      console.log('받아온 예산 데이터:', data);
 
-      // 로컬 스토리지에 저장
-      localStorage.setItem('budget', JSON.stringify(data));
+      // 선택된 월의 예산 데이터 찾기
+      const selectedYear = parseInt(currentDate.getFullYear());
+      const selectedMonth = parseInt(currentDate.getMonth() + 1);
 
-      // 카테고리 예산 업데이트
-      const newCategories = [
-        { name: '기저귀/물티슈', budget: data.diaperBudget || 0 },
-        { name: '생활/위생용품', budget: data.sanitaryBudget || 0 },
-        { name: '수유/이유용품', budget: data.feedingBudget || 0 },
-        { name: '스킨케어/화장품', budget: data.skincareBudget || 0 },
-        { name: '식품', budget: data.foodBudget || 0 },
-        { name: '완구용품', budget: data.toysBudget || 0 },
-        { name: '침구류', budget: data.beddingBudget || 0 },
-        { name: '패션의류/잡화', budget: data.fashionBudget || 0 },
-        { name: '기타', budget: data.otherBudget || 0 },
+      console.log('Selected Date:', selectedYear, selectedMonth);
+      console.log('Available Budget Data:', data);
+
+      const currentBudget = data.find((budget) => {
+        const budgetYear = parseInt(budget.year);
+        const budgetMonth = parseInt(budget.month);
+        console.log(
+          'Comparing:',
+          budgetYear,
+          budgetMonth,
+          'with',
+          selectedYear,
+          selectedMonth
+        );
+        return budgetYear === selectedYear && budgetMonth === selectedMonth;
+      });
+
+      console.log('Found Budget:', currentBudget);
+
+      // 기본 카테고리 구조 정의
+      const defaultCategories = [
+        { name: '기저귀/물티슈', budget: 0 },
+        { name: '생활/위생용품', budget: 0 },
+        { name: '수유/이유용품', budget: 0 },
+        { name: '스킨케어/화장품', budget: 0 },
+        { name: '식품', budget: 0 },
+        { name: '완구용품', budget: 0 },
+        { name: '침구류', budget: 0 },
+        { name: '패션의류/잡화', budget: 0 },
+        { name: '기타', budget: 0 },
       ];
-      setCategories(newCategories);
+
+      if (currentBudget && currentBudget.categories) {
+        const { categories } = currentBudget;
+        const newCategories = defaultCategories.map((category) => {
+          const categoryMap = {
+            '기저귀/물티슈': 'diaper',
+            '생활/위생용품': 'sanitary',
+            '수유/이유용품': 'feeding',
+            '스킨케어/화장품': 'skincare',
+            식품: 'food',
+            완구용품: 'toys',
+            침구류: 'bedding',
+            '패션의류/잡화': 'fashion',
+            기타: 'other',
+          };
+          const apiKey = categoryMap[category.name];
+          return {
+            ...category,
+            budget: parseInt(categories[apiKey]) || 0,
+          };
+        });
+        console.log('Setting categories:', newCategories);
+        setCategories(newCategories);
+      } else {
+        console.log('Setting default categories');
+        setCategories(defaultCategories);
+      }
     } catch (error) {
       console.error('Error fetching budget data:', error);
-      alert(error.message);
+      // 에러 발생 시에도 기본 카테고리로 초기화
+      const defaultCategories = [
+        { name: '기저귀/물티슈', budget: 0 },
+        { name: '생활/위생용품', budget: 0 },
+        { name: '수유/이유용품', budget: 0 },
+        { name: '스킨케어/화장품', budget: 0 },
+        { name: '식품', budget: 0 },
+        { name: '완구용품', budget: 0 },
+        { name: '침구류', budget: 0 },
+        { name: '패션의류/잡화', budget: 0 },
+        { name: '기타', budget: 0 },
+      ];
+      setCategories(defaultCategories);
     }
   };
 
@@ -128,7 +203,6 @@ export default function BudgetPage() {
     if (userStr) {
       const user = JSON.parse(userStr);
       setMonthlyBudget(user.monthlyBudget || 0);
-      setCurrentSpending(5); // 임시 데이터
     }
 
     // 현재 예산 데이터 불러오기
@@ -138,6 +212,7 @@ export default function BudgetPage() {
 
   // 현재 월의 지출 데이터 계산
   useEffect(() => {
+    fetchBudgetData();
     fetchMonthlySpending();
   }, [currentDate]); // currentDate가 변경될 때마다 실행
 
@@ -170,8 +245,6 @@ export default function BudgetPage() {
       newDate.setMonth(prev.getMonth() - 1);
       return newDate;
     });
-    fetchBudgetData(); // 월 변경 시 예산 데이터 다시 불러오기
-    fetchMonthlySpending(); // 월 변경 시 지출 데이터 다시 불러오기
   };
 
   const handleNextMonth = () => {
@@ -180,8 +253,6 @@ export default function BudgetPage() {
       newDate.setMonth(prev.getMonth() + 1);
       return newDate;
     });
-    fetchBudgetData(); // 월 변경 시 예산 데이터 다시 불러오기
-    fetchMonthlySpending(); // 월 변경 시 지출 데이터 다시 불러오기
   };
 
   const handleBudgetChange = (index, value) => {
@@ -227,43 +298,28 @@ export default function BudgetPage() {
         return;
       }
 
-      // 카테고리별 예산 설정 (필요한 필드만)
+      // 카테고리별 예산을 새로운 형식으로 변환
+      const categoryBudgets = {
+        diaper: categories.find((c) => c.name === '기저귀/물티슈').budget,
+        sanitary: categories.find((c) => c.name === '생활/위생용품').budget,
+        feeding: categories.find((c) => c.name === '수유/이유용품').budget,
+        skincare: categories.find((c) => c.name === '스킨케어/화장품').budget,
+        food: categories.find((c) => c.name === '식품').budget,
+        toys: categories.find((c) => c.name === '완구용품').budget,
+        bedding: categories.find((c) => c.name === '침구류').budget,
+        fashion: categories.find((c) => c.name === '패션의류/잡화').budget,
+        other: categories.find((c) => c.name === '기타').budget,
+      };
+
       const budgetData = {
-        diaperBudget:
-          Number(
-            categories.find((cat) => cat.name === '기저귀/물티슈')?.budget
-          ) || 0,
-        sanitaryBudget:
-          Number(
-            categories.find((cat) => cat.name === '생활/위생용품')?.budget
-          ) || 0,
-        feedingBudget:
-          Number(
-            categories.find((cat) => cat.name === '수유/이유용품')?.budget
-          ) || 0,
-        skincareBudget:
-          Number(
-            categories.find((cat) => cat.name === '스킨케어/화장품')?.budget
-          ) || 0,
-        foodBudget:
-          Number(categories.find((cat) => cat.name === '식품')?.budget) || 0,
-        toysBudget:
-          Number(categories.find((cat) => cat.name === '완구용품')?.budget) ||
-          0,
-        beddingBudget:
-          Number(categories.find((cat) => cat.name === '침구류')?.budget) || 0,
-        fashionBudget:
-          Number(
-            categories.find((cat) => cat.name === '패션의류/잡화')?.budget
-          ) || 0,
-        otherBudget:
-          Number(categories.find((cat) => cat.name === '기타')?.budget) || 0,
+        year: currentDate.getFullYear(),
+        month: currentDate.getMonth() + 1,
+        categories: categoryBudgets,
       };
 
       const response = await fetch('http://localhost:3005/budget', {
         method: 'POST',
         headers: {
-          Accept: 'application/json',
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
@@ -271,36 +327,14 @@ export default function BudgetPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData?.message || '예산 저장에 실패했습니다.');
+        throw new Error('예산 설정에 실패했습니다.');
       }
 
-      const data = await response.json();
-      console.log('Save response:', data);
-
-      // 성공 시 카테고리 업데이트
-      const newCategories = [
-        { name: '기저귀/물티슈', budget: data.diaperBudget },
-        { name: '생활/위생용품', budget: data.sanitaryBudget },
-        { name: '수유/이유용품', budget: data.feedingBudget },
-        { name: '스킨케어/화장품', budget: data.skincareBudget },
-        { name: '식품', budget: data.foodBudget },
-        { name: '완구용품', budget: data.toysBudget },
-        { name: '침구류', budget: data.beddingBudget },
-        { name: '패션의류/잡화', budget: data.fashionBudget },
-        { name: '기타', budget: data.otherBudget },
-      ];
-
-      // 카테고리 상태 업데이트
-      setCategories(newCategories);
-
-      // 로컬 스토리지 업데이트
-      localStorage.setItem('budget', JSON.stringify(data));
-
-      alert('예산이 성공적으로 저장되었습니다.');
+      alert('예산이 성공적으로 설정되었습니다.');
+      fetchBudgetData(); // 업데이트된 예산 데이터 다시 불러오기
     } catch (error) {
-      console.error('Error details:', error);
-      alert(`예산 저장 실패: ${error.message}`);
+      console.error('Error saving budget:', error);
+      alert(error.message);
     }
   };
 

@@ -48,52 +48,102 @@ export default function StatisticsPage() {
   const [monthlySpending, setMonthlySpending] = useState(0);
   const [yearlyData, setYearlyData] = useState([]);
   const [monthlyBudget, setMonthlyBudget] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null); // 사용자 상태 추가
+
+  // 사용자 데이터와 지출 데이터 가져오기
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (storedUser) {
+      setUser(storedUser);
+      setMonthlyBudget(storedUser.monthlyBudget || 0); // monthlyBudget 설정
+    }
+
+    const fetchSpendingData = async () => {
+      try {
+        const accessToken = localStorage.getItem('access_token');
+        if (!accessToken) {
+          console.log('No access token found');
+          setLoading(false);
+          return;
+        }
+
+        const response = await fetch('http://localhost:3005/budget/spending', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (response.status === 404) {
+          console.log('No spending data found');
+          setCategoryData([]);
+          setMonthlySpending(0);
+          setYearlyData(Array(12).fill(0));
+          setLoading(false);
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch spending data');
+        }
+
+        const data = await response.json();
+        processData(data.spending || []);
+      } catch (error) {
+        console.error('Error fetching spending data:', error);
+        setCategoryData([]);
+        setMonthlySpending(0);
+        setYearlyData(Array(12).fill(0));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSpendingData();
+  }, [currentDate]); // currentDate가 변경될 때마다 데이터 업데이트
 
   // 데이터 처리 함수
-  const processData = () => {
-    const spendingData = JSON.parse(localStorage.getItem('spendingData'));
-    if (spendingData) {
-      const year = currentDate.getFullYear();
-      const month = currentDate.getMonth();
+  const processData = (spendingData) => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
 
-      // 1. 해당 월의 카테고리별 데이터 처리
-      const monthlyData = spendingData.spending
-        .map((category) => {
-          const details = category.details.filter((detail) => {
-            const date = new Date(detail.date);
-            return date.getFullYear() === year && date.getMonth() === month;
-          });
-
-          const totalAmount = details.reduce(
-            (sum, detail) => sum + detail.amount,
-            0
-          );
-
-          return {
-            name: categoryMap[category.category] || category.category,
-            amount: totalAmount,
-            details: details,
-          };
-        })
-        .filter((category) => category.amount > 0);
-
-      setCategoryData(monthlyData);
-      setMonthlySpending(
-        monthlyData.reduce((sum, category) => sum + category.amount, 0)
-      );
-
-      // 2. 연간 데이터 처리
-      const yearlyTotals = Array(12).fill(0);
-      spendingData.spending.forEach((category) => {
-        category.details.forEach((detail) => {
+    // 1. 해당 월의 카테고리별 데이터 처리
+    const monthlyData = spendingData
+      .map((category) => {
+        const details = category.details.filter((detail) => {
           const date = new Date(detail.date);
-          if (date.getFullYear() === year) {
-            yearlyTotals[date.getMonth()] += detail.amount;
-          }
+          return date.getFullYear() === year && date.getMonth() === month;
         });
+
+        const totalAmount = details.reduce(
+          (sum, detail) => sum + detail.amount,
+          0
+        );
+
+        return {
+          name: categoryMap[category.category] || category.category,
+          amount: totalAmount,
+          details: details,
+        };
+      })
+      .filter((category) => category.amount > 0);
+
+    // 2. 연간 데이터 처리
+    const yearlyTotals = Array(12).fill(0);
+    spendingData.forEach((category) => {
+      category.details.forEach((detail) => {
+        const date = new Date(detail.date);
+        if (date.getFullYear() === year) {
+          yearlyTotals[date.getMonth()] += detail.amount;
+        }
       });
-      setYearlyData(yearlyTotals);
-    }
+    });
+
+    setCategoryData(monthlyData);
+    setMonthlySpending(
+      monthlyData.reduce((sum, category) => sum + category.amount, 0)
+    );
+    setYearlyData(yearlyTotals);
   };
 
   // 년월 변경 핸들러
@@ -113,19 +163,9 @@ export default function StatisticsPage() {
     });
   };
 
-  // currentDate가 변경될 때마다 데이터 업데이트
-  useEffect(() => {
-    processData();
-  }, [currentDate]);
-
-  // 초기 마운트 시 예산 정보 가져오기
-  useEffect(() => {
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-      const user = JSON.parse(userStr);
-      setMonthlyBudget(user.monthlyBudget || 0);
-    }
-  }, []);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   const pieData = {
     labels: categoryData.map((category) => category.name),
@@ -191,7 +231,7 @@ export default function StatisticsPage() {
       },
       {
         label: '월별 예산',
-        data: Array(12).fill(monthlyBudget),
+        data: Array(12).fill(user?.monthlyBudget || 0),
         backgroundColor: 'rgba(255, 99, 132, 0.5)',
         borderColor: 'rgba(255, 99, 132, 1)',
         borderWidth: 1,
@@ -370,7 +410,7 @@ export default function StatisticsPage() {
             </div>
             <div className="mt-4 text-center">
               <p className="text-gray-600">
-                월별 예산: {monthlyBudget.toLocaleString()}원
+                월별 예산: {user?.monthlyBudget?.toLocaleString()}원
               </p>
               <p className="text-gray-600">
                 연간 총 지출:{' '}

@@ -111,7 +111,8 @@ export default function SignupPage() {
         localStorage.setItem('access_token', data.access_token);
         localStorage.setItem('refresh_token', data.refresh_token);
         localStorage.setItem('user', JSON.stringify(data.user));
-
+        localStorage.removeItem('spendingData');
+        localStorage.removeItem('budget');
         console.log('로컬 스토리지 저장 완료');
         console.log('메인 페이지로 이동 중...');
 
