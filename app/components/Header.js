@@ -178,14 +178,13 @@ export default function Header({ onLogin }) {
     window.location.href = '/';
   };
 
-
   return (
     <header className="bg-white shadow-md p-4 flex flex-col items-center">
       <div className="w-full flex justify-between items-center px-6">
         <Link href="/">
           <Image src="/hama_logo.jpg" alt="HAMA Logo" width={150} height={50} />
         </Link>
-        
+
         <div className="flex justify-center">
           <input
             type="text"

@@ -105,6 +105,23 @@ export default function MyPage() {
         console.log('예산 삭제 성공');
       }
 
+      // 리뷰 삭제 요청
+      const reviewsResponse = await fetch('http://localhost:3004/reviews', {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (reviewsResponse.status === 404) {
+        console.log('리뷰 데이터가 없습니다.'); // 예외 처리
+      } else if (!reviewsResponse.ok) {
+        throw new Error('리뷰 삭제 실패');
+      } else {
+        console.log('리뷰 전체 삭제 성공');
+      }
+
       // 회원 탈퇴 요청
       const response = await fetch('http://localhost:3001/auth/delete', {
         method: 'DELETE',

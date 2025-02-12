@@ -5,6 +5,7 @@ import Header from '@/app/components/Header';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import ko from 'date-fns/locale/ko'; // 한국어 로케일
+import { useRouter } from 'next/router';
 
 export default function CalendarPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -18,6 +19,16 @@ export default function CalendarPage() {
   const [selectedDateSpending, setSelectedDateSpending] = useState([]);
   const [dailySpending, setDailySpending] = useState({}); // 추가: 일별 지출 내역
   const [monthlySpending, setMonthlySpending] = useState(0); // 추가: 월별 총 지출액
+  const [spendingToEdit, setSpendingToEdit] = useState(null); // 수정할 지출 내역
+  const [spendingItems, setSpendingItems] = useState([
+    {
+      date: selectedDate.toISOString().split('T')[0],
+      category: '',
+      itemName: '',
+      amount: '',
+    },
+  ]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   // 전체 지출 내역 조회
   useEffect(() => {
@@ -98,6 +109,16 @@ export default function CalendarPage() {
     setMonthlySpending(totalMonthSpending);
   }, [currentDate, allSpending]); // currentDate나 allSpending이 변경될 때만 실행
 
+  // 선택된 날짜가 변경될 때 수정 모드 초기화
+  useEffect(() => {
+    // spendingToEdit가 null일 때만 초기화
+    if (!spendingToEdit) {
+      setProductName('');
+      setSpendingAmount('');
+      setSelectedCategory('');
+    }
+  }, [selectedDate]);
+
   // 월 이동 핸들러 수정
   const handlePrevMonth = () => {
     setCurrentDate((prev) => {
@@ -160,94 +181,6 @@ export default function CalendarPage() {
     return categoryMap[category] || 'other';
   };
 
-  // 지출 등록 핸들러 수정
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!selectedCategory || !productName || !spendingAmount) {
-      alert('모든 필드를 입력해주세요.');
-      return;
-    }
-
-    try {
-      const accessToken = localStorage.getItem('access_token');
-      if (!accessToken) {
-        alert('로그인이 필요합니다.');
-        return;
-      }
-
-      // 선택된 날짜의 시간을 현지 시간 정오로 설정
-      const localDate = new Date(selectedDate);
-      localDate.setHours(12, 0, 0, 0);
-
-      const requestBody = {
-        date: localDate.toISOString().split('T')[0], // 현지 시간 기준으로 날짜 변환
-        category: getCategoryValue(selectedCategory),
-        itemName: productName,
-        amount: parseInt(spendingAmount),
-      };
-
-      const response = await fetch('http://localhost:3005/budget/spending', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-
-        // 전체 지출 내역 다시 가져오기
-        const spendingResponse = await fetch(
-          'http://localhost:3005/budget/spending',
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-
-        if (spendingResponse.ok) {
-          const spendingData = await spendingResponse.json();
-          setAllSpending(spendingData.spending || []); // 전체 지출 내역 업데이트
-
-          // 현재 날짜의 지출 내역도 업데이트
-          const day = selectedDate.getDate();
-          const newSpending = {
-            date: selectedDate,
-            category: selectedCategory,
-            itemName: productName,
-            amount: parseInt(spendingAmount),
-          };
-
-          setDailySpending((prev) => ({
-            ...prev,
-            [day]: [...(prev[day] || []), newSpending],
-          }));
-
-          // 월별 총 지출액 업데이트
-          setMonthlySpending((prev) => prev + parseInt(spendingAmount));
-        }
-
-        // 폼 초기화
-        setSelectedCategory('');
-        setProductName('');
-        setSpendingAmount('');
-
-        alert('지출이 등록되었습니다.');
-      } else {
-        const errorData = await response.text();
-        console.error('Error response:', errorData);
-        alert('지출 등록에 실패했습니다.');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('서버 통신 중 오류가 발생했습니다.');
-    }
-  };
-
   // 카테고리 이름 변환 함수
   const getCategoryName = (category) => {
     const categoryMap = {
@@ -261,7 +194,123 @@ export default function CalendarPage() {
       fashion: '패션의류/잡화',
       other: '기타',
     };
-    return categoryMap[category] || category;
+
+    // 역방향 매핑도 추가 (한글 -> 영문)
+    const reverseMap = Object.entries(categoryMap).reduce(
+      (acc, [key, value]) => {
+        acc[value] = key;
+        return acc;
+      },
+      {}
+    );
+
+    // 카테고리가 이미 한글인 경우 그대로 반환
+    if (Object.values(categoryMap).includes(category)) {
+      return category;
+    }
+
+    // 영문 카테고리인 경우 한글로 변환
+    return categoryMap[category] || '기타';
+  };
+
+  const addSpendingItem = () => {
+    setSpendingItems([
+      ...spendingItems,
+      {
+        date: selectedDate.toISOString().split('T')[0],
+        category: '',
+        itemName: '',
+        amount: '',
+      },
+    ]);
+  };
+
+  const removeSpendingItem = (index) => {
+    setSpendingItems(spendingItems.filter((_, i) => i !== index));
+  };
+
+  const updateSpendingItem = (index, field, value) => {
+    const newItems = [...spendingItems];
+    newItems[index][field] = value;
+    setSpendingItems(newItems);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validate all spending items
+    for (const item of spendingItems) {
+      if (!item.category || !item.itemName || !item.amount) {
+        alert('모든 필드를 입력해주세요.');
+        return;
+      }
+    }
+
+    // Prepare the request body
+    const requestBody = {
+      spendings: spendingItems.map((item) => ({
+        date: item.date,
+        category: getCategoryValue(item.category),
+        itemName: item.itemName,
+        amount: parseInt(item.amount),
+      })),
+    };
+
+    try {
+      const accessToken = localStorage.getItem('access_token');
+      if (!accessToken) {
+        alert('로그인이 필요합니다.');
+        return;
+      }
+
+      const response = await fetch('http://localhost:3005/budget/spendings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Error response:', errorData);
+        alert('지출 등록에 실패했습니다.');
+        return;
+      }
+
+      const responseData = await response.json();
+
+      // allSpending 상태 업데이트
+      const newSpendings = responseData.spendings.map((spending) => ({
+        category: spending.category,
+        details: [
+          {
+            uid: spending.uid,
+            date: spending.date,
+            itemName: spending.itemName,
+            amount: spending.amount,
+          },
+        ],
+      }));
+
+      setAllSpending((prevSpending) => [...prevSpending, ...newSpendings]);
+
+      alert(responseData.message);
+
+      // 폼 초기화
+      setSpendingItems([
+        {
+          date: selectedDate.toISOString().split('T')[0],
+          category: '',
+          itemName: '',
+          amount: '',
+        },
+      ]);
+    } catch (error) {
+      console.error('Error:', error);
+      alert('서버 통신 중 오류가 발생했습니다.');
+    }
   };
 
   // 날짜 클릭 핸들러
@@ -275,6 +324,176 @@ export default function CalendarPage() {
   // 날짜 선택 핸들러
   const handleDateChange = (date) => {
     setSelectedDate(date);
+    // 지출 내역을 업데이트하는 로직 추가
+    const day = date.getDate();
+    setSelectedDateSpending(dailySpending[day] || []);
+  };
+
+  // 지출 수정 핸들러
+  const handleEditSpending = (spending) => {
+    setSpendingToEdit(spending);
+    setProductName(spending.itemName);
+    setSpendingAmount(spending.amount);
+    setSelectedCategory(spending.category);
+    setSelectedDate(new Date(spending.date)); // 수정하려는 지출의 날짜로 설정
+  };
+
+  // 지출 수정 취소 핸들러
+  const handleCancelEdit = () => {
+    setSpendingToEdit(null);
+    setProductName('');
+    setSpendingAmount('');
+    setSelectedCategory('');
+    // 원래의 날짜로 설정
+    setSelectedDate(new Date(selectedDate)); // 원래 날짜로 설정
+  };
+
+  // 지출 수정 제출 핸들러
+  const handleUpdateSpending = async (e) => {
+    e.preventDefault();
+    if (!selectedCategory || !productName || !spendingAmount) {
+      alert('모든 필드를 입력해주세요.');
+      return;
+    }
+
+    try {
+      const accessToken = localStorage.getItem('access_token');
+      if (!accessToken) {
+        alert('로그인이 필요합니다.');
+        return;
+      }
+
+      const requestBody = {
+        date: selectedDate.toISOString().split('T')[0],
+        category: getCategoryValue(selectedCategory),
+        itemName: productName,
+        amount: parseInt(spendingAmount),
+      };
+
+      const response = await fetch(
+        `http://localhost:3005/budget/spending/${spendingToEdit.uid}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+
+      if (response.ok) {
+        alert('지출이 수정되었습니다.');
+        // 수정 후 지출 내역 다시 가져오기
+        const updatedSpending = await response.json();
+        setAllSpending((prev) =>
+          prev.map((spending) =>
+            spending._id === updatedSpending._id ? updatedSpending : spending
+          )
+        );
+        setSpendingToEdit(null); // 수정 모드 종료
+        setProductName('');
+        setSpendingAmount('');
+        setSelectedCategory('');
+      } else {
+        alert('지출 수정에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('서버 통신 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 지출 삭제 핸들러
+  const handleDeleteSpending = async (spendingId) => {
+    const confirmDelete = window.confirm('이 지출 내역을 삭제하시겠습니까?');
+    if (!confirmDelete) return;
+
+    try {
+      const accessToken = localStorage.getItem('access_token');
+      const response = await fetch(
+        `http://localhost:3005/budget/spending/${spendingId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        alert('지출이 삭제되었습니다.');
+        setAllSpending((prev) =>
+          prev.filter((spending) => spending._id !== spendingId)
+        );
+      } else {
+        alert('지출 삭제에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('서버 통신 중 오류가 발생했습니다.');
+    }
+  };
+
+  // OCR 파일 처리 함수 수정
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsAnalyzing(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const accessToken = localStorage.getItem('access_token');
+      const response = await fetch('http://localhost:3006/analyze', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('OCR 분석에 실패했습니다.');
+      }
+
+      const data = await response.json();
+      console.log('OCR 응답:', data); // 전체 응답 확인
+
+      // OCR 결과를 지출 항목으로 변환
+      const newSpendingItems = data.analysisResult.items.map((item) => {
+        // 한글 카테고리를 영문으로 변환
+        const categoryMap = {
+          식품: 'food',
+          '기저귀/물티슈': 'diaper',
+          '생활/위생용품': 'sanitary',
+          '수유/이유용품': 'feeding',
+          '스킨케어/화장품': 'skincare',
+          완구용품: 'toys',
+          침구류: 'bedding',
+          '패션의류/잡화': 'fashion',
+        };
+
+        const mappedCategory = categoryMap[item.category] || 'other';
+        console.log('원본 카테고리:', item.category);
+        console.log('변환된 카테고리:', mappedCategory);
+
+        return {
+          date: selectedDate.toISOString().split('T')[0],
+          category: mappedCategory,
+          itemName: item.itemName,
+          amount: item.amount.toString(),
+        };
+      });
+
+      setSpendingItems(newSpendingItems);
+    } catch (error) {
+      console.error('OCR 분석 오류:', error);
+      alert('영수증 분석 중 오류가 발생했습니다.');
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const renderCalendar = () => {
@@ -440,39 +659,123 @@ export default function CalendarPage() {
                       <th className="px-6 py-3 text-right text-black font-semibold">
                         지출
                       </th>
+                      <th className="px-6 py-3 text-right text-black font-semibold">
+                        작업
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {selectedDate && selectedDateSpending.length > 0 ? (
-                      selectedDateSpending.map((spending, index) => (
-                        <tr key={index}>
-                          <td className="px-6 py-4 text-black">
-                            {currentDate.getMonth() + 1}월{' '}
-                            {selectedDate.getDate()}일
-                          </td>
-                          <td className="px-6 py-4 text-black">
-                            {getCategoryName(spending.category)}
-                          </td>
-                          <td className="px-6 py-4 text-black">
-                            {spending.itemName}
-                          </td>
-                          <td className="px-6 py-4 text-right text-red-600">
-                            {spending.amount?.toLocaleString()}원
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td
-                          colSpan={4}
-                          className="px-6 py-4 text-center text-gray-500"
-                        >
-                          {selectedDate
-                            ? '해당 날짜의 지출 내역이 없습니다.'
-                            : '날짜를 선택하면 상세 내역이 표시됩니다.'}
-                        </td>
+                    {selectedDateSpending.map((spending) => (
+                      <tr key={spending._id}>
+                        {spendingToEdit?._id === spending._id ? (
+                          // 수정 모드
+                          <>
+                            <td className="px-6 py-4">
+                              <DatePicker
+                                selected={selectedDate}
+                                onChange={(date) => setSelectedDate(date)}
+                                dateFormat="yyyy-MM-dd"
+                                className="border p-2 rounded w-full text-black"
+                              />
+                            </td>
+                            <td className="px-6 py-4">
+                              <select
+                                value={selectedCategory}
+                                onChange={(e) =>
+                                  setSelectedCategory(e.target.value)
+                                }
+                                className="border p-2 rounded w-full text-black"
+                              >
+                                <option value="">카테고리 선택</option>
+                                <option value="기저귀/물티슈">
+                                  기저귀/물티슈
+                                </option>
+                                <option value="생활/위생용품">
+                                  생활/위생용품
+                                </option>
+                                <option value="수유/이유용품">
+                                  수유/이유용품
+                                </option>
+                                <option value="스킨케어/화장품">
+                                  스킨케어/화장품
+                                </option>
+                                <option value="식품">식품</option>
+                                <option value="완구용품">완구용품</option>
+                                <option value="침구류">침구류</option>
+                                <option value="패션의류/잡화">
+                                  패션의류/잡화
+                                </option>
+                                <option value="기타">기타</option>
+                              </select>
+                            </td>
+                            <td className="px-6 py-4">
+                              <input
+                                type="text"
+                                value={productName}
+                                onChange={(e) => setProductName(e.target.value)}
+                                className="border p-2 rounded w-full text-black"
+                              />
+                            </td>
+                            <td className="px-6 py-4">
+                              <input
+                                type="number"
+                                value={spendingAmount}
+                                onChange={(e) =>
+                                  setSpendingAmount(e.target.value)
+                                }
+                                className="border p-2 rounded w-full text-black text-right"
+                              />
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <button
+                                onClick={handleUpdateSpending}
+                                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition"
+                              >
+                                저장
+                              </button>
+                              <button
+                                onClick={handleCancelEdit}
+                                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition ml-2"
+                              >
+                                취소
+                              </button>
+                            </td>
+                          </>
+                        ) : (
+                          // 일반 모드
+                          <>
+                            <td className="px-6 py-4 text-black">
+                              {spending.date}
+                            </td>
+                            <td className="px-6 py-4 text-black">
+                              {getCategoryName(spending.category)}
+                            </td>
+                            <td className="px-6 py-4 text-black">
+                              {spending.itemName}
+                            </td>
+                            <td className="px-6 py-4 text-right text-red-600">
+                              {spending.amount.toLocaleString()}원
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <button
+                                onClick={() => handleEditSpending(spending)}
+                                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+                              >
+                                수정
+                              </button>
+                              <button
+                                onClick={() =>
+                                  handleDeleteSpending(spending._id)
+                                }
+                                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition ml-2"
+                              >
+                                삭제
+                              </button>
+                            </td>
+                          </>
+                        )}
                       </tr>
-                    )}
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -480,80 +783,196 @@ export default function CalendarPage() {
 
             {/* 지출 등록 */}
             <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-xl font-bold mb-4 text-black">지출 등록</h3>
-              <form
-                onSubmit={handleSubmit}
-                className="mt-4 bg-white p-4 rounded shadow-md"
-              >
-                <div className="mb-6">
-                  <label className="block text-black font-medium mb-2 text-lg">
-                    구매 날짜
-                  </label>
-                  <DatePicker
-                    selected={selectedDate}
-                    onChange={handleDateChange}
-                    dateFormat="yyyy-MM-dd"
-                    locale={ko}
-                    className="border p-2 rounded w-full text-black"
-                    placeholderText="날짜 선택"
-                    showTimeSelect={false}
-                  />
-                </div>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold mb-4 text-black">지출 등록</h2>
+                <div className="flex items-center space-x-4">
+                  {/* OCR 업로드 버튼 */}
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                      id="receipt-upload"
+                      disabled={isAnalyzing}
+                    />
+                    <label
+                      htmlFor="receipt-upload"
+                      className={`flex items-center cursor-pointer ${
+                        isAnalyzing
+                          ? 'bg-gray-400'
+                          : 'bg-purple-500 hover:bg-purple-600'
+                      } text-white py-2 px-4 rounded-md transition duration-200`}
+                    >
+                      {isAnalyzing ? (
+                        <>
+                          <svg
+                            className="animate-spin h-5 w-5 mr-2"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                              fill="none"
+                            />
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            />
+                          </svg>
+                          분석 중...
+                        </>
+                      ) : (
+                        <>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5 mr-2"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                            />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                            />
+                          </svg>
+                          영수증 스캔
+                        </>
+                      )}
+                    </label>
+                  </div>
 
-                <div className="mb-6">
-                  <label className="block text-black font-medium mb-2 text-lg">
-                    카테고리
-                  </label>
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="border p-2 rounded w-full text-black"
+                  {/* 기존 지출 항목 추가 버튼 */}
+                  <button
+                    type="button"
+                    onClick={addSpendingItem}
+                    className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md transition duration-200 flex items-center"
                   >
-                    <option value="">카테고리 선택</option>
-                    <option value="기저귀/물티슈">기저귀/물티슈</option>
-                    <option value="생활/위생용품">생활/위생용품</option>
-                    <option value="수유/이유용품">수유/이유용품</option>
-                    <option value="스킨케어/화장품">스킨케어/화장품</option>
-                    <option value="식품">식품</option>
-                    <option value="완구용품">완구용품</option>
-                    <option value="침구류">침구류</option>
-                    <option value="패션의류/잡화">패션의류/잡화</option>
-                    <option value="기타">기타</option>
-                  </select>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 mr-2"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 4v16m8-8H4"
+                      />
+                    </svg>
+                    지출 항목 추가
+                  </button>
                 </div>
+              </div>
 
-                <div className="mb-6">
-                  <label className="block text-black font-medium mb-2 text-lg">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="flex items-center mb-2 font-semibold text-gray-700 bg-gray-100 p-2 rounded-md">
+                  <span className="w-1/4 text-center text-black font-semibold">
+                    날짜
+                  </span>
+                  <span className="w-1/4 text-center text-black font-semibold">
+                    카테고리
+                  </span>
+                  <span className="w-1/4 text-center text-black font-semibold">
                     상품명
-                  </label>
-                  <input
-                    type="text"
-                    value={productName}
-                    onChange={(e) => setProductName(e.target.value)}
-                    className="border p-2 rounded w-full text-black"
-                    placeholder="상품명을 입력하세요"
-                  />
+                  </span>
+                  <span className="w-1/4 text-center text-black font-semibold">
+                    금액
+                  </span>
                 </div>
 
-                <div className="mb-6">
-                  <label className="block text-black font-medium mb-2 text-lg">
-                    지출 금액
-                  </label>
-                  <input
-                    type="number"
-                    value={spendingAmount}
-                    onChange={(e) => setSpendingAmount(e.target.value)}
-                    className="border p-2 rounded w-full text-black"
-                    placeholder="금액을 입력하세요"
-                  />
-                </div>
+                {spendingItems.map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center space-x-4 p-4 border border-gray-300 rounded-lg bg-white shadow-md hover:shadow-lg transition-shadow duration-200"
+                  >
+                    <input
+                      type="date"
+                      value={item.date}
+                      onChange={(e) =>
+                        updateSpendingItem(index, 'date', e.target.value)
+                      }
+                      className="w-1/4 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                      required
+                    />
 
-                <button
-                  type="submit"
-                  className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
-                >
-                  저장
-                </button>
+                    <select
+                      value={item.category}
+                      onChange={(e) =>
+                        updateSpendingItem(index, 'category', e.target.value)
+                      }
+                      className="w-1/4 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                      required
+                    >
+                      <option value="">카테고리 선택</option>
+                      <option value="diaper">기저귀/물티슈</option>
+                      <option value="sanitary">생활/위생용품</option>
+                      <option value="feeding">수유/이유용품</option>
+                      <option value="skincare">스킨케어/화장품</option>
+                      <option value="food">식품</option>
+                      <option value="toys">완구용품</option>
+                      <option value="bedding">침구류</option>
+                      <option value="fashion">패션의류/잡화</option>
+                      <option value="other">기타</option>
+                    </select>
+
+                    <input
+                      type="text"
+                      value={item.itemName}
+                      onChange={(e) =>
+                        updateSpendingItem(index, 'itemName', e.target.value)
+                      }
+                      placeholder="상품명"
+                      className="w-1/4 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                      required
+                    />
+
+                    <input
+                      type="number"
+                      value={item.amount}
+                      onChange={(e) =>
+                        updateSpendingItem(index, 'amount', e.target.value)
+                      }
+                      placeholder="금액"
+                      className="w-1/4 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                      required
+                    />
+
+                    {spendingItems.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeSpendingItem(index)}
+                        className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-200"
+                      >
+                        삭제
+                      </button>
+                    )}
+                  </div>
+                ))}
+
+                <div className="flex justify-end mt-4">
+                  <button
+                    type="submit"
+                    className="bg-green-500 text-white py-2 px-6 rounded-md hover:bg-green-600 transition duration-200"
+                  >
+                    등록하기
+                  </button>
+                </div>
               </form>
             </div>
           </div>
