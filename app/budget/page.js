@@ -642,7 +642,7 @@ export default function BudgetPage() {
 
                   {selectedCategory === category.name && (
                     <div
-                      className={`ml-44 mt-2 bg-white rounded-lg p-4 shadow-md flex-1 transition-transform duration-300 transform ${
+                      className={`mt-2 bg-white rounded-lg p-4 shadow-md flex-1 transition-transform duration-300 transform ${
                         selectedCategory ? 'translate-y-0' : '-translate-y-full'
                       } w-full`}
                     >

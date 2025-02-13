@@ -74,12 +74,11 @@ export default function CalendarPage() {
     fetchAllSpending();
   }, []); // 컴포넌트 마운트 시 한 번만 실행
 
-  // 현재 선택된 월의 지출 데이터 계산
+  // allSpending이 변경될 때마다 dailySpending을 다시 계산하는 useEffect 수정
   useEffect(() => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
+    // 수정 모드일 때는 실행하지 않음
+    if (spendingToEdit) return;
 
-    // 현재 월의 지출 데이터 필터링
     const currentMonthSpending = {};
     let totalMonthSpending = 0;
 
@@ -88,8 +87,8 @@ export default function CalendarPage() {
         categoryData.details.forEach((detail) => {
           const spendingDate = new Date(detail.date);
           if (
-            spendingDate.getFullYear() === year &&
-            spendingDate.getMonth() === month
+            spendingDate.getFullYear() === currentDate.getFullYear() &&
+            spendingDate.getMonth() === currentDate.getMonth()
           ) {
             const day = spendingDate.getDate();
             if (!currentMonthSpending[day]) {
@@ -107,7 +106,13 @@ export default function CalendarPage() {
 
     setDailySpending(currentMonthSpending);
     setMonthlySpending(totalMonthSpending);
-  }, [currentDate, allSpending]); // currentDate나 allSpending이 변경될 때만 실행
+
+    // 현재 선택된 날짜의 지출 내역도 업데이트
+    if (selectedDate) {
+      const day = selectedDate.getDate();
+      setSelectedDateSpending(currentMonthSpending[day] || []);
+    }
+  }, [allSpending, currentDate, selectedDate, spendingToEdit]); // spendingToEdit 의존성 추가
 
   // 선택된 날짜가 변경될 때 수정 모드 초기화
   useEffect(() => {
@@ -380,9 +385,10 @@ export default function CalendarPage() {
   const handleEditSpending = (spending) => {
     setSpendingToEdit(spending);
     setProductName(spending.itemName);
-    setSpendingAmount(spending.amount);
-    setSelectedCategory(spending.category);
-    setSelectedDate(new Date(spending.date)); // 수정하려는 지출의 날짜로 설정
+    setSpendingAmount(spending.amount.toString());
+    // 카테고리를 한글로 변환하여 설정
+    setSelectedCategory(getCategoryName(spending.category));
+    setSelectedDate(new Date(spending.date));
   };
 
   // 지출 수정 취소 핸들러
@@ -431,13 +437,31 @@ export default function CalendarPage() {
 
       if (response.ok) {
         alert('지출이 수정되었습니다.');
-        // 수정 후 지출 내역 다시 가져오기
-        const updatedSpending = await response.json();
-        setAllSpending((prev) =>
-          prev.map((spending) =>
-            spending._id === updatedSpending._id ? updatedSpending : spending
-          )
+        // 수정 후 전체 지출 데이터를 다시 불러옴
+        const spendingResponse = await fetch(
+          'http://localhost:3005/budget/spending',
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
         );
+
+        if (spendingResponse.ok) {
+          const spendingData = await spendingResponse.json();
+          setAllSpending(spendingData.spending || []);
+
+          // 선택된 날짜의 지출 내역도 업데이트
+          const day = selectedDate.getDate();
+          const updatedDailySpending = spendingData.spending.filter(
+            (spending) => {
+              const spendingDate = new Date(spending.date);
+              return spendingDate.getDate() === day;
+            }
+          );
+          setSelectedDateSpending(updatedDailySpending);
+        }
+
         setSpendingToEdit(null); // 수정 모드 종료
         setProductName('');
         setSpendingAmount('');
@@ -470,9 +494,21 @@ export default function CalendarPage() {
 
       if (response.ok) {
         alert('지출이 삭제되었습니다.');
-        setAllSpending((prev) =>
-          prev.filter((spending) => spending._id !== spendingId)
+
+        // 삭제 후 전체 지출 데이터를 다시 불러옴
+        const spendingResponse = await fetch(
+          'http://localhost:3005/budget/spending',
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
         );
+
+        if (spendingResponse.ok) {
+          const spendingData = await spendingResponse.json();
+          setAllSpending(spendingData.spending || []);
+        }
       } else {
         alert('지출 삭제에 실패했습니다.');
       }
@@ -840,7 +876,7 @@ export default function CalendarPage() {
                               </button>
                               <button
                                 onClick={() =>
-                                  handleDeleteSpending(spending._id)
+                                  handleDeleteSpending(spending.uid)
                                 }
                                 className="inline-flex items-center px-3 py-1 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors duration-200"
                               >
