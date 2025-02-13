@@ -1,6 +1,7 @@
 'use client';
 import Firstpage from './Firstpage';
 import UserDashboard from './UserDashboard';
+import Categoryproduct from './Categoryproduct';
 
 export default function HeroSection({ userInfo, childAge, monthlySpending }) {
   if (!userInfo) {
@@ -14,11 +15,14 @@ export default function HeroSection({ userInfo, childAge, monthlySpending }) {
   );
 
   return (
-    <UserDashboard
-      userInfo={userInfo}
-      childAge={childAge}
-      monthlySpending={monthlySpending}
-      remainingBudget={remainingBudget}
-    />
+    <>
+      <UserDashboard
+        userInfo={userInfo}
+        childAge={childAge}
+        monthlySpending={monthlySpending}
+        remainingBudget={remainingBudget}
+      />
+      <Categoryproduct />
+    </>
   );
 }
