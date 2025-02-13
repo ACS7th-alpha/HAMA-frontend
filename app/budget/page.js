@@ -31,6 +31,9 @@ export default function BudgetPage() {
     기타: 0,
   });
 
+  const [spendingDetails, setSpendingDetails] = useState({});
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
   const calculatePercentage = (spent, budget) => {
     // 예산이 0이고 지출이 있는 경우 100% 표시
     if (budget === 0 && spent > 0) return 100;
@@ -197,6 +200,36 @@ export default function BudgetPage() {
     }
   };
 
+  const fetchSpendingData = async () => {
+    try {
+      const accessToken = localStorage.getItem('access_token');
+      const response = await fetch('http://localhost:3005/budget/spending', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch spending data');
+      }
+
+      const data = await response.json();
+      console.log('Fetched spending data:', data);
+
+      const spendingMap = {};
+      data.spending.forEach((item) => {
+        spendingMap[item.category] = item.details;
+      });
+
+      setSpendingDetails(spendingMap);
+      console.log('Spending details organized:', spendingMap);
+    } catch (error) {
+      console.error('Error fetching spending data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     // 사용자 정보와 당월 예산 설정
     const userStr = localStorage.getItem('user');
@@ -216,6 +249,10 @@ export default function BudgetPage() {
     fetchMonthlySpending();
   }, [currentDate]); // currentDate가 변경될 때마다 실행
 
+  useEffect(() => {
+    fetchSpendingData();
+  }, []);
+
   // 카테고리 이름 변환 함수
   const getCategoryName = (category) => {
     const categoryMap = {
@@ -232,6 +269,22 @@ export default function BudgetPage() {
     return categoryMap[category] || category;
   };
 
+  // 카테고리 이름 변환 함수
+  const getCategoryKey = (categoryName) => {
+    const categoryMap = {
+      '기저귀/물티슈': 'diaper',
+      '생활/위생용품': 'sanitary',
+      '수유/이유용품': 'feeding',
+      '스킨케어/화장품': 'skincare',
+      식품: 'food',
+      완구용품: 'toys',
+      침구류: 'bedding',
+      '패션의류/잡화': 'fashion',
+      기타: 'other',
+    };
+    return categoryMap[categoryName] || categoryName; // 기본적으로 원래 이름 반환
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -245,6 +298,7 @@ export default function BudgetPage() {
       newDate.setMonth(prev.getMonth() - 1);
       return newDate;
     });
+    setSelectedCategory(null);
   };
 
   const handleNextMonth = () => {
@@ -253,6 +307,7 @@ export default function BudgetPage() {
       newDate.setMonth(prev.getMonth() + 1);
       return newDate;
     });
+    setSelectedCategory(null);
   };
 
   const handleBudgetChange = (index, value) => {
@@ -338,6 +393,15 @@ export default function BudgetPage() {
     }
   };
 
+  const handleCategoryClick = (categoryName) => {
+    console.log('Clicked category:', categoryName);
+    if (selectedCategory === categoryName) {
+      setSelectedCategory(null);
+    } else {
+      setSelectedCategory(categoryName);
+    }
+  };
+
   // 카테고리별 게이지 바 컴포넌트
   const CategoryBar = ({ category, budget, spending }) => {
     const percentage = calculatePercentage(spending, budget);
@@ -363,6 +427,7 @@ export default function BudgetPage() {
           <div
             className={`h-2.5 rounded-full ${barColor} transition-all duration-300`}
             style={{ width: `${Math.min(percentage, 100)}%` }}
+            onClick={() => handleCategoryClick(category)}
           ></div>
         </div>
       </div>
@@ -467,7 +532,7 @@ export default function BudgetPage() {
                   className={`absolute top-0 left-4 h-8 flex items-center ${
                     currentSpending > monthlyBudget
                       ? 'text-red-600'
-                      : 'text-black'
+                      : 'text-blue-600'
                   }`}
                 >
                   {currentSpending.toLocaleString()}원
@@ -478,7 +543,7 @@ export default function BudgetPage() {
                     className={
                       currentSpending > monthlyBudget
                         ? 'text-red-600'
-                        : 'text-black'
+                        : 'text-blue-600'
                     }
                   >
                     {spendingPercentage.toFixed(0)}%
@@ -487,10 +552,10 @@ export default function BudgetPage() {
                     className={
                       currentSpending > monthlyBudget
                         ? 'text-red-600'
-                        : 'text-black'
+                        : 'text-blue-600'
                     }
                   >
-                    +{remainingBudget.toLocaleString()}원
+                    {remainingBudget.toLocaleString()}원
                   </span>
                 </div>
               </div>
@@ -505,66 +570,127 @@ export default function BudgetPage() {
               const isOverBudget = spent > category.budget;
 
               return (
-                <div key={index} className="flex gap-4">
-                  <div className="bg-white rounded-lg p-6 shadow-md w-40">
-                    <div className="text-gray-600 mb-1 text-center">
-                      {category.name}
-                    </div>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={category.budget.toLocaleString()}
-                        onChange={(e) =>
-                          handleBudgetChange(
-                            index,
-                            e.target.value.replace(/,/g, '')
-                          )
-                        }
-                        className="font-bold text-black w-full focus:outline-none text-center pr-6"
-                      />
-                      <span className="absolute right-0 top-1/2 -translate-y-1/2 text-black">
-                        원
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex-1 bg-white rounded-lg p-6 shadow-md flex items-center">
-                    <div className="relative w-full">
-                      <div className="w-full bg-gray-100 rounded-full h-8">
-                        <div
-                          className={`h-8 rounded-full ${
-                            isOverBudget ? 'bg-red-200' : 'bg-blue-200'
-                          }`}
-                          style={{ width: `${Math.min(percentage, 100)}%` }}
+                <div key={index}>
+                  <div className="flex gap-4">
+                    <div className="bg-white rounded-lg p-6 shadow-md w-40">
+                      <div className="text-gray-600 mb-1 text-center">
+                        {category.name}
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={category.budget.toLocaleString()}
+                          onChange={(e) =>
+                            handleBudgetChange(
+                              index,
+                              e.target.value.replace(/,/g, '')
+                            )
+                          }
+                          className="font-bold text-black w-full focus:outline-none text-center pr-6"
                         />
-                      </div>
-
-                      <div
-                        className={`absolute top-0 left-4 h-8 flex items-center ${
-                          isOverBudget ? 'text-red-600' : 'text-black'
-                        }`}
-                      >
-                        {spent.toLocaleString()}원
-                      </div>
-
-                      <div className="absolute top-0 right-4 h-8 flex items-center gap-2">
-                        <span
-                          className={
-                            isOverBudget ? 'text-red-600' : 'text-black'
-                          }
-                        >
-                          {percentage.toFixed(0)}%
-                        </span>
-                        <span
-                          className={
-                            isOverBudget ? 'text-red-600' : 'text-black'
-                          }
-                        >
-                          +{remaining.toLocaleString()}원
+                        <span className="absolute right-0 top-1/2 -translate-y-1/2 text-black">
+                          원
                         </span>
                       </div>
                     </div>
+
+                    <div
+                      className="flex-1 bg-white rounded-lg p-6 shadow-md cursor-pointer hover:bg-gray-50"
+                      onClick={() => handleCategoryClick(category.name)}
+                    >
+                      <div className="relative w-full">
+                        <div className="w-full bg-gray-100 rounded-full h-8">
+                          <div
+                            className={`h-8 rounded-full ${
+                              isOverBudget ? 'bg-red-200' : 'bg-blue-200'
+                            }`}
+                            style={{ width: `${Math.min(percentage, 100)}%` }}
+                          />
+                        </div>
+                        <div
+                          className={`absolute top-0 left-4 h-8 flex items-center ${
+                            spent > category.budget
+                              ? 'text-red-600'
+                              : 'text-blue-600'
+                          }`}
+                        >
+                          {spent.toLocaleString()}원
+                        </div>
+                        <div className="absolute top-0 right-4 h-8 flex items-center gap-2">
+                          <span
+                            className={
+                              spent > category.budget
+                                ? 'text-red-600'
+                                : 'text-blue-600'
+                            }
+                          >
+                            {percentage.toFixed(0)}%
+                          </span>
+                          <span
+                            className={
+                              spent > category.budget
+                                ? 'text-red-600'
+                                : 'text-blue-600'
+                            }
+                          >
+                            {remaining.toLocaleString()}원
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
+
+                  {selectedCategory === category.name && (
+                    <div
+                      className={`ml-44 mt-2 bg-white rounded-lg p-4 shadow-md flex-1 transition-transform duration-300 transform ${
+                        selectedCategory ? 'translate-y-0' : '-translate-y-full'
+                      } w-full`}
+                    >
+                      <h3 className="font-semibold mb-2">
+                        {category.name} 지출 내역
+                      </h3>
+                      {console.log(
+                        'Available spending details keys:',
+                        Object.keys(spendingDetails)
+                      )}
+                      {spendingDetails[getCategoryKey(category.name)] ? (
+                        <>
+                          {console.log(
+                            'Spending details for category:',
+                            spendingDetails[getCategoryKey(category.name)]
+                          )}
+                          {spendingDetails[getCategoryKey(category.name)]
+                            .length > 0 ? (
+                            <ul className="space-y-2">
+                              {spendingDetails[
+                                getCategoryKey(category.name)
+                              ].map((detail) => {
+                                console.log('Spending detail:', detail);
+                                return (
+                                  <li
+                                    key={detail._id}
+                                    className="flex justify-between items-center"
+                                  >
+                                    <span>{detail.date}</span>
+                                    <span>{detail.itemName}</span>
+                                    <span>
+                                      {detail.amount.toLocaleString()}원
+                                    </span>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          ) : (
+                            <p className="text-gray-500">
+                              지출 내역이 없습니다.
+                            </p>
+                          )}
+                        </>
+                      ) : (
+                        <p className="text-gray-500">지출 내역이 없습니다.</p>
+                      )}
+                    </div>
+                  )}
                 </div>
               );
             })}
