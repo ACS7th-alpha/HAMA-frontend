@@ -180,7 +180,7 @@ export default function CategoryProduct() {
 
 
             {products.length > 0 && (
-              <div className="flex justify-center items-center gap-4 mt-12">
+              <div className="flex justify-center items-center gap-1 mt-12">
                 <button
                   onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
                   disabled={page === 1}
@@ -190,12 +190,12 @@ export default function CategoryProduct() {
                 </button>
 
                 {/* 페이지 번호 목록 */}
-                <div className="flex gap-2">
+                <div className="flex gap-1">
                   {Array.from({ length: endPage - startPage + 1 }, (_, idx) => startPage + idx).map((n) => (
                     <button
                       key={n}
                       onClick={() => setPage(n)}
-                      className={`px-4 py-2 rounded-full text-pink-600 font-medium ${page === n ? 'bg-pink-100' : 'hover:bg-pink-50'}`}
+                      className={`rounded-full text-pink-600 font-medium ${page === n ? 'bg-pink-100' : 'bg-white hover:bg-pink-50'}`}
                     >
                       {n}
                     </button>

@@ -294,9 +294,6 @@ export default function ProductDetail() {
                 </div>
               </div>
             )}
-
-            {/* 리뷰 통계 */}
-
           </div>
         )}
       </div>
