@@ -3,10 +3,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { GoogleLogin } from '@react-oauth/google';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Header({ onLogin }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [tokenCheckInterval, setTokenCheckInterval] = useState(null);
+  const [keyword, setKeyword] = useState('');
+  const router = useRouter();
 
   // 토큰 상태 체크 함수
   const checkTokenStatus = () => {
@@ -178,6 +181,13 @@ export default function Header({ onLogin }) {
     window.location.href = '/';
   };
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (keyword.trim()) {
+      router.push(`/search?keyword=${encodeURIComponent(keyword)}`);
+    }
+  };
+
   return (
     <header className="bg-white shadow-md p-4 flex flex-col items-center">
       <div className="w-full flex justify-between items-center px-6">
@@ -186,11 +196,23 @@ export default function Header({ onLogin }) {
         </Link>
 
         <div className="flex justify-center">
-          <input
-            type="text"
-            placeholder="어떤 상품을 찾으시나요?"
-            className="w-full px-8 py-3 border-2 border-pink-100 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-lg placeholder-gray-400 shadow-sm transition-all duration-200"
-          />
+          <form onSubmit={handleSearch} className="flex-1 max-w-xl mx-4">
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                placeholder="어떤 상품을 찾으시나요?"
+                className="flex-1 px-4 py-2 rounded-full border-2 border-pink-200 focus:border-pink-500 focus:outline-none"
+              />
+              <button
+                type="submit"
+                className="px-6 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition-colors duration-200 whitespace-nowrap"
+              >
+                검색
+              </button>
+            </div>
+          </form>
         </div>
 
         <div className="flex items-center gap-4">
