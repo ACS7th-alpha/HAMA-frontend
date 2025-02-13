@@ -22,7 +22,7 @@ export default function CalendarPage() {
   const [spendingToEdit, setSpendingToEdit] = useState(null); // 수정할 지출 내역
   const [spendingItems, setSpendingItems] = useState([
     {
-      date: selectedDate.toISOString().split('T')[0],
+      date: '',
       category: '',
       itemName: '',
       amount: '',
@@ -126,8 +126,9 @@ export default function CalendarPage() {
       newDate.setMonth(prev.getMonth() - 1);
       return newDate;
     });
-    // 지출 내역 초기화
-    setSelectedDateSpending([]);
+    // 지출 내역 초기화 및 등록 상태 초기화
+    resetSpendingForm();
+    setSelectedDateSpending([]); // 지출 내역 초기화
   };
 
   const handleNextMonth = () => {
@@ -136,9 +137,29 @@ export default function CalendarPage() {
       newDate.setMonth(prev.getMonth() + 1);
       return newDate;
     });
-    // 지출 내역 초기화
-    setSelectedDateSpending([]);
+    // 지출 내역 초기화 및 등록 상태 초기화
+    resetSpendingForm();
+    setSelectedDateSpending([]); // 지출 내역 초기화
   };
+
+  // 지출 등록 상태 초기화 함수
+  const resetSpendingForm = () => {
+    setSpendingItems([
+      {
+        date: '',
+        category: '',
+        itemName: '',
+        amount: '',
+      },
+    ]);
+    setSpendingToEdit(null);
+    setProductName('');
+    setSpendingAmount('');
+    setSelectedCategory('');
+  };
+
+  // 지출 등록 버튼 상태 관리
+  const isEditing = spendingToEdit !== null;
 
   // 달력 데이터 생성
   const generateCalendarDays = () => {
@@ -165,8 +186,24 @@ export default function CalendarPage() {
     return days;
   };
 
-  // 카테고리 매핑 함수
+  // 카테고리 매핑 함수 수정
   const getCategoryValue = (category) => {
+    // 이미 영문 카테고리인 경우 그대로 반환
+    if (
+      category === 'diaper' ||
+      category === 'sanitary' ||
+      category === 'feeding' ||
+      category === 'skincare' ||
+      category === 'food' ||
+      category === 'toys' ||
+      category === 'bedding' ||
+      category === 'fashion' ||
+      category === 'other'
+    ) {
+      return category;
+    }
+
+    // 한글 카테고리를 영문으로 매핑
     const categoryMap = {
       '기저귀/물티슈': 'diaper',
       '생활/위생용품': 'sanitary',
@@ -178,7 +215,10 @@ export default function CalendarPage() {
       '패션의류/잡화': 'fashion',
       기타: 'other',
     };
-    return categoryMap[category] || 'other';
+
+    const categoryValue = categoryMap[category] || 'other';
+    console.log(`Category Input: ${category}, Mapped Value: ${categoryValue}`);
+    return categoryValue;
   };
 
   // 카테고리 이름 변환 함수
@@ -217,7 +257,7 @@ export default function CalendarPage() {
     setSpendingItems([
       ...spendingItems,
       {
-        date: selectedDate.toISOString().split('T')[0],
+        date: '',
         category: '',
         itemName: '',
         amount: '',
@@ -248,12 +288,18 @@ export default function CalendarPage() {
 
     // Prepare the request body
     const requestBody = {
-      spendings: spendingItems.map((item) => ({
-        date: item.date,
-        category: getCategoryValue(item.category),
-        itemName: item.itemName,
-        amount: parseInt(item.amount),
-      })),
+      spendings: spendingItems.map((item) => {
+        const categoryValue = getCategoryValue(item.category); // 카테고리 매핑
+        console.log(
+          `Item: ${item.itemName}, Category: ${categoryValue}, Amount: ${item.amount}`
+        ); // 로그 추가
+        return {
+          date: item.date,
+          category: categoryValue,
+          itemName: item.itemName,
+          amount: parseInt(item.amount),
+        };
+      }),
     };
 
     try {
@@ -273,40 +319,29 @@ export default function CalendarPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.text();
-        console.error('Error response:', errorData);
-        alert('지출 등록에 실패했습니다.');
-        return;
+        throw new Error('지출 등록에 실패했습니다.');
       }
 
       const responseData = await response.json();
-
-      // allSpending 상태 업데이트
-      const newSpendings = responseData.spendings.map((spending) => ({
-        category: spending.category,
-        details: [
-          {
-            uid: spending.uid,
-            date: spending.date,
-            itemName: spending.itemName,
-            amount: spending.amount,
-          },
-        ],
-      }));
-
-      setAllSpending((prevSpending) => [...prevSpending, ...newSpendings]);
-
       alert(responseData.message);
 
-      // 폼 초기화
-      setSpendingItems([
+      // 지출 등록 성공 후 전체 지출 내역을 다시 불러오기
+      const spendingResponse = await fetch(
+        'http://localhost:3005/budget/spending',
         {
-          date: selectedDate.toISOString().split('T')[0],
-          category: '',
-          itemName: '',
-          amount: '',
-        },
-      ]);
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (spendingResponse.ok) {
+        const spendingData = await spendingResponse.json();
+        setAllSpending(spendingData.spending || []);
+      }
+
+      // 폼 초기화
+      resetSpendingForm();
     } catch (error) {
       console.error('Error:', error);
       alert('서버 통신 중 오류가 발생했습니다.');
@@ -471,33 +506,15 @@ export default function CalendarPage() {
       }
 
       const data = await response.json();
-      console.log('OCR 응답:', data); // 전체 응답 확인
+      console.log('OCR 응답:', data);
 
       // OCR 결과를 지출 항목으로 변환
-      const newSpendingItems = data.analysisResult.items.map((item) => {
-        // 한글 카테고리를 영문으로 변환
-        const categoryMap = {
-          식품: 'food',
-          '기저귀/물티슈': 'diaper',
-          '생활/위생용품': 'sanitary',
-          '수유/이유용품': 'feeding',
-          '스킨케어/화장품': 'skincare',
-          완구용품: 'toys',
-          침구류: 'bedding',
-          '패션의류/잡화': 'fashion',
-        };
-
-        const mappedCategory = categoryMap[item.category] || 'other';
-        console.log('원본 카테고리:', item.category);
-        console.log('변환된 카테고리:', mappedCategory);
-
-        return {
-          date: selectedDate.toISOString().split('T')[0],
-          category: mappedCategory,
-          itemName: item.itemName,
-          amount: item.amount.toString(),
-        };
-      });
+      const newSpendingItems = data.analysisResult.items.map((item) => ({
+        date: item.date || '', // 날짜가 없으면 빈 문자열 사용
+        category: getCategoryValue(item.category), // 카테고리 매핑 함수 사용
+        itemName: item.itemName,
+        amount: item.amount ? item.amount.toString() : '0', // 금액이 없으면 '0'으로 설정
+      }));
 
       setSpendingItems(newSpendingItems);
     } catch (error) {
@@ -678,7 +695,7 @@ export default function CalendarPage() {
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {selectedDateSpending.map((spending) => (
-                      <tr key={spending._id}>
+                      <tr key={spending.uid || spending.itemName}>
                         {spendingToEdit?._id === spending._id ? (
                           // 수정 모드
                           <>
@@ -742,6 +759,7 @@ export default function CalendarPage() {
                               <div className="flex justify-end mt-4">
                                 <button
                                   type="submit"
+                                  onClick={handleUpdateSpending}
                                   className="inline-flex items-center px-4 py-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors duration-200 mr-2"
                                 >
                                   <svg
@@ -762,13 +780,7 @@ export default function CalendarPage() {
                                 </button>
                                 <button
                                   type="button"
-                                  onClick={() => {
-                                    // 취소 동작 정의
-                                    setSpendingToEdit(null);
-                                    setProductName('');
-                                    setSpendingAmount('');
-                                    setSelectedCategory('');
-                                  }}
+                                  onClick={resetSpendingForm}
                                   className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 transition-colors duration-200"
                                 >
                                   <svg
@@ -1043,53 +1055,73 @@ export default function CalendarPage() {
                 ))}
 
                 <div className="flex justify-end mt-4">
-                  <button
-                    type="submit"
-                    className="inline-flex items-center px-4 py-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors duration-200 mr-2"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 mr-1"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+                  {isEditing ? (
+                    <>
+                      <button
+                        type="submit"
+                        onClick={handleUpdateSpending}
+                        className="inline-flex items-center px-4 py-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors duration-200 mr-2"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 mr-1"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                        저장하기
+                      </button>
+                      <button
+                        type="button"
+                        onClick={resetSpendingForm}
+                        className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 transition-colors duration-200"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 mr-1"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                        취소
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={handleSubmit}
+                      className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors duration-200"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    저장하기
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      // 취소 동작 정의
-                      setSpendingToEdit(null);
-                      setProductName('');
-                      setSpendingAmount('');
-                      setSelectedCategory('');
-                    }}
-                    className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 transition-colors duration-200"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 mr-1"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                    취소
-                  </button>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 mr-1"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                        />
+                      </svg>
+                      등록하기
+                    </button>
+                  )}
                 </div>
               </form>
             </div>
