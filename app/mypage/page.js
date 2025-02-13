@@ -11,6 +11,13 @@ export default function MyPage() {
   const [activeTab, setActiveTab] = useState('profile');
   const [myPosts, setMyPosts] = useState([]); // 내가 쓴 글 저장할 상태
   const [loading, setLoading] = useState(false);
+  const [childToEdit, setChildToEdit] = useState(null);
+  const [newChild, setNewChild] = useState({
+    name: '',
+    birthdate: '',
+    gender: 'male',
+  }); // 새로운 자녀 정보 상태
+  const [isAddingChild, setIsAddingChild] = useState(false); // 추가 모드 상태
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -143,6 +150,196 @@ export default function MyPage() {
     }
   };
 
+  const handleDeleteChild = async (index) => {
+    const childToDelete = userInfo.children[index];
+    const confirmDelete = window.confirm(
+      `${childToDelete.name}의 정보를 정말 삭제하시겠습니까?`
+    );
+    if (!confirmDelete) return;
+
+    try {
+      const accessToken = localStorage.getItem('access_token');
+      if (!accessToken) throw new Error('로그인이 필요합니다.');
+
+      console.log(`Deleting child: ${childToDelete.name}`); // 삭제할 아기 이름 로그
+      const response = await fetch(
+        `http://localhost:3001/auth/children/${childToDelete.name}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error('Failed to delete child:', response.statusText); // 실패 로그
+        throw new Error('아기 정보 삭제 실패');
+      }
+
+      // 삭제 성공 시, 상태에서 해당 아기 정보 제거
+      const updatedChildren = userInfo.children.filter(
+        (_, idx) => idx !== index
+      );
+      setUserInfo((prev) => {
+        const updatedUserInfo = { ...prev, children: updatedChildren };
+        localStorage.setItem('user', JSON.stringify(updatedUserInfo)); // 로컬 스토리지 업데이트
+        return updatedUserInfo;
+      });
+      alert(`${childToDelete.name}의 정보가 삭제되었습니다.`);
+      console.log(`${childToDelete.name}의 정보가 성공적으로 삭제되었습니다.`); // 성공 로그
+    } catch (error) {
+      console.error('Error deleting child:', error);
+      alert('아기 정보 삭제 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleEditChild = (index, field, value) => {
+    setUserInfo((prev) => {
+      const updatedChildren = prev.children.map((child, i) =>
+        i === index ? { ...child, [field]: value } : child
+      );
+      const updatedUserInfo = { ...prev, children: updatedChildren };
+      localStorage.setItem('user', JSON.stringify(updatedUserInfo));
+      return updatedUserInfo;
+    });
+  };
+
+  const handleEditClick = (index, originalName) => {
+    setChildToEdit({ index, originalName });
+  };
+
+  const handleSaveChild = async (index) => {
+    const child = userInfo.children[index];
+    const originalName = childToEdit.originalName; // 수정 전의 이름
+    const updatedName = child.name; // 수정된 이름
+    const updatedGender = child.gender; // 수정된 성별
+    const updatedBirthdate = child.birthdate; // 수정된 생년월일
+
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    const requestBody = {
+      name: updatedName,
+      gender: updatedGender,
+      birthdate: updatedBirthdate,
+    };
+    console.log(
+      'Sending request body:',
+      JSON.stringify(requestBody),
+      originalName
+    ); // 요청 본문 로그
+
+    try {
+      const response = await fetch(
+        `http://localhost:3001/auth/children/${encodeURIComponent(
+          originalName
+        )}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+
+      if (!response.ok) {
+        const errorDetails = await response.text();
+        console.error('Error details:', errorDetails);
+        throw new Error(
+          `아기 정보 수정 실패: ${response.status} ${response.statusText}`
+        );
+      }
+
+      // 수정 성공 시, 상태에서 해당 아기 정보 업데이트
+      const updatedChildren = userInfo.children.map((child, idx) =>
+        idx === index
+          ? {
+              ...child,
+              name: updatedName,
+              gender: updatedGender,
+              birthdate: updatedBirthdate,
+            }
+          : child
+      );
+
+      setUserInfo((prev) => {
+        const updatedUserInfo = { ...prev, children: updatedChildren };
+        localStorage.setItem('user', JSON.stringify(updatedUserInfo));
+        return updatedUserInfo;
+      });
+
+      alert('아기 정보가 성공적으로 수정되었습니다.');
+      setChildToEdit(null); // 수정 모드 종료
+    } catch (error) {
+      console.error('Error updating child:', error);
+      alert('아기 정보 수정 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleAddChild = () => {
+    setIsAddingChild(true); // 추가 모드 활성화
+  };
+
+  const handleSaveNewChild = async () => {
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    const requestBody = {
+      name: newChild.name,
+      gender: newChild.gender,
+      birthdate: newChild.birthdate,
+    };
+
+    console.log('Sending request body:', JSON.stringify(requestBody)); // 요청 본문 로그
+
+    try {
+      const response = await fetch('http://localhost:3001/auth/children', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        const errorDetails = await response.text();
+        console.error('Error details:', errorDetails);
+        throw new Error(
+          `아기 정보 추가 실패: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const data = await response.json(); // 서버에서 응답받은 데이터
+
+      // 새로운 사용자 정보를 userInfo에 업데이트
+      setUserInfo(data.user); // 응답에서 user 정보를 사용하여 상태 업데이트
+
+      // 입력 필드 초기화
+      setNewChild({ name: '', birthdate: '', gender: 'male' });
+      setIsAddingChild(false); // 추가 모드 비활성화
+      alert('아기 정보가 성공적으로 추가되었습니다.');
+    } catch (error) {
+      console.error('Error adding child:', error);
+      alert('아기 정보 추가 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleCancelAddChild = () => {
+    setNewChild({ name: '', birthdate: '', gender: 'male' }); // 입력 필드 초기화
+    setIsAddingChild(false); // 추가 모드 비활성화
+  };
+
   if (!userInfo) {
     return (
       <div className="min-h-screen bg-pink-50">
@@ -243,30 +440,185 @@ export default function MyPage() {
           )}
           {activeTab === 'children' && (
             <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                자녀 정보 <span className="ml-2">👶</span>
+              <h2 className="text-2xl font-bold text-gray-800 mb-6 flex justify-between items-center">
+                자녀 정보 👶
+                <button
+                  onClick={handleAddChild}
+                  className="ml-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                >
+                  추가
+                </button>
               </h2>
+              {isAddingChild && ( // 추가 모드일 때 입력 필드 표시
+                <div className="rounded-2xl p-6 border-2 border-blue-100 flex justify-between items-center mb-4">
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <p className="text-gray-600 mb-2">이름</p>
+                      <input
+                        type="text"
+                        value={newChild.name}
+                        onChange={(e) =>
+                          setNewChild({ ...newChild, name: e.target.value })
+                        }
+                        className="text-lg font-semibold border border-gray-300 rounded-md p-2"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <p className="text-gray-600 mb-2">생년월일</p>
+                      <input
+                        type="date"
+                        value={newChild.birthdate}
+                        onChange={(e) =>
+                          setNewChild({
+                            ...newChild,
+                            birthdate: e.target.value,
+                          })
+                        }
+                        className="text-lg font-semibold border border-gray-300 rounded-md p-2"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <p className="text-gray-600 mb-2">성별</p>
+                      <select
+                        value={newChild.gender}
+                        onChange={(e) =>
+                          setNewChild({ ...newChild, gender: e.target.value })
+                        }
+                        className="text-lg font-semibold border border-gray-300 rounded-md p-2"
+                        required
+                      >
+                        <option value="male">남자</option>
+                        <option value="female">여자</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSaveNewChild}
+                      className="px-4 py-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors"
+                    >
+                      저장
+                    </button>
+                    <button
+                      onClick={handleCancelAddChild}
+                      className="px-4 py-2 bg-gray-300 text-gray-600 rounded-md hover:bg-gray-400 transition-colors"
+                    >
+                      취소
+                    </button>
+                  </div>
+                </div>
+              )}
               {userInfo.children && userInfo.children.length > 0 ? (
                 userInfo.children.map((child, index) => (
                   <div
                     key={index}
-                    className=" rounded-2xl p-6 border-2 border-blue-100"
+                    className="rounded-2xl p-6 border-2 border-blue-100 flex justify-between items-center"
                   >
                     <div className="grid grid-cols-2 gap-6">
-                      <div>
-                        <p className="text-gray-600 mb-2">이름</p>
-                        <p className="text-lg font-semibold">{child.name}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-600 mb-2">생년월일</p>
-                        <p className="text-lg font-semibold">
-                          {new Date(child.birthdate).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-gray-600 mb-2">성별</p>
-                        <p className="text-lg font-semibold">{child.gender}</p>
-                      </div>
+                      {childToEdit?.index === index ? (
+                        <>
+                          <div>
+                            <p className="text-gray-600 mb-2">이름</p>
+                            <input
+                              type="text"
+                              value={child.name}
+                              onChange={(e) =>
+                                handleEditChild(index, 'name', e.target.value)
+                              }
+                              className="text-lg font-semibold border border-gray-300 rounded-md p-2"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <p className="text-gray-600 mb-2">생년월일</p>
+                            <input
+                              type="date"
+                              value={child.birthdate.split('T')[0]}
+                              onChange={(e) =>
+                                handleEditChild(
+                                  index,
+                                  'birthdate',
+                                  e.target.value
+                                )
+                              }
+                              className="text-lg font-semibold border border-gray-300 rounded-md p-2"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <p className="text-gray-600 mb-2">성별</p>
+                            <select
+                              value={child.gender}
+                              onChange={(e) =>
+                                handleEditChild(index, 'gender', e.target.value)
+                              }
+                              className="text-lg font-semibold border border-gray-300 rounded-md p-2"
+                              required
+                            >
+                              <option value="male">남자</option>
+                              <option value="female">여자</option>
+                            </select>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div>
+                            <p className="text-gray-600 mb-2">이름</p>
+                            <p className="text-lg font-semibold">
+                              {child.name}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600 mb-2">생년월일</p>
+                            <p className="text-lg font-semibold">
+                              {new Date(child.birthdate).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600 mb-2">성별</p>
+                            <p className="text-lg font-semibold">
+                              {child.gender === 'male' ? '남자' : '여자'}
+                            </p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      {childToEdit?.index === index ? (
+                        <>
+                          <button
+                            onClick={() => handleSaveChild(index)}
+                            className="px-4 py-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors"
+                          >
+                            저장
+                          </button>
+                          <button
+                            onClick={() => setChildToEdit(null)}
+                            className="px-4 py-2 bg-gray-300 text-gray-600 rounded-md hover:bg-gray-400 transition-colors"
+                          >
+                            취소
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => handleEditClick(index, child.name)}
+                            className="px-4 py-2 bg-yellow-300 text-black rounded-md hover:bg-yellow-400 transition-colors"
+                          >
+                            수정
+                          </button>
+                          {userInfo.children.length > 1 && (
+                            <button
+                              onClick={() => handleDeleteChild(index)}
+                              className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                            >
+                              삭제
+                            </button>
+                          )}
+                        </>
+                      )}
                     </div>
                   </div>
                 ))
@@ -320,7 +672,7 @@ export default function MyPage() {
                                   : 'bg-red-100 text-red-600'
                               }`}
                             >
-                              {post.recommended ? '👶 추천템' : '😢 비추천템'}
+                              {post.recommended ? '추천템' : '😢 비추천템'}
                             </span>
                           </div>
                         </div>
