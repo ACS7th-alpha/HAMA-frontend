@@ -202,7 +202,7 @@ export default function ProductRecommendations() {
           <>
             {childAge !== null && (
               <>
-                <h2 className="text-2xl font-bold mb-6 text-black text-left">
+                <h2 className="text-2xl font-bold mb-6 text-black text-left mt-16">
                   {childAge}개월, 준비 리스트
                 </h2>
                 <div className="relative px-8">

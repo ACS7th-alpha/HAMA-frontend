@@ -8,6 +8,7 @@ import HeroSection from './components/HeroSection';
 import ConsumptionAnalysis from './components/ConsumptionAnalysis';
 import ProductRecommendations from './components/ProductRecommendations';
 import Footer from './components/Footer';
+import ProductList from './product/page';
 
 export default function HomePage() {
   const router = useRouter();
@@ -197,9 +198,8 @@ export default function HomePage() {
         monthlySpending={monthlySpending}
       />
       <ConsumptionAnalysis />
-      <ProductRecommendations />
+      <ProductList />
       <Footer />
-      <button onClick={handleGoToStatistics}>지출 통계 보기</button>
     </div>
   );
 }
