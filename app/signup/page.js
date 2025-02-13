@@ -216,7 +216,7 @@ export default function SignupPage() {
                   <button
                     type="button"
                     onClick={() => removeChild(child.id)}
-                    className="text-red-500 text-sm hover:text-red-700"
+                    className="bg-red-600 text-white text-sm py-1 px-2 rounded-md hover:bg-red-700 transition-colors"
                   >
                     삭제
                   </button>
@@ -264,18 +264,18 @@ export default function SignupPage() {
           <button
             type="button"
             onClick={addChild}
-            className="w-full px-3 py-2 text-blue-600 border border-blue-600 rounded-md hover:bg-blue-50 font-medium"
+            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors"
           >
-            + 자녀 추가
+            자녀 추가
           </button>
 
           {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium"
+            className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors"
           >
-            가입하기
+            등록하기
           </button>
         </form>
       </div>
