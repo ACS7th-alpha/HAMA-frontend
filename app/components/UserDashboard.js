@@ -74,29 +74,35 @@ export default function UserDashboard({
 
               {/* 새로운 귀여운 네모 칸 추가 */}
               <div className="bg-white rounded-2xl p-4 mt-6 shadow-md border-2 border-blue-10">
-                <p className="text-xl font-semibold text-center">
-                  <span role="img" aria-label="pig">
-                    🐻
-                  </span>{' '}
-                  하루에{' '}
-                  <span className="text-green-500 font-bold text-lg">
-                    {(() => {
-                      const remainingBudget =
-                        userInfo.monthlyBudget - monthlySpending;
-                      const remainingDays =
-                        new Date(
-                          new Date().getFullYear(),
-                          new Date().getMonth() + 1,
-                          0
-                        ).getDate() - new Date().getDate();
-                      return remainingDays > 0
-                        ? (remainingBudget / remainingDays).toLocaleString()
-                        : 0;
-                    })()}
-                    원
-                  </span>{' '}
-                  이하로 써야 예산을 지킬 수 있어요!
-                </p>
+                {monthlySpending > userInfo.monthlyBudget ? ( // 조건부 렌더링
+                  <p className="text-xl font-semibold text-red-500 text-center">
+                    이번 달 예산을 다 쓰셔서, 아끼셔야 해요! 😢
+                  </p>
+                ) : (
+                  <p className="text-xl font-semibold text-center">
+                    <span role="img" aria-label="pig">
+                      🐷
+                    </span>{' '}
+                    하루에{' '}
+                    <span className="text-green-500 font-bold text-lg">
+                      {(() => {
+                        const remainingBudget =
+                          userInfo.monthlyBudget - monthlySpending;
+                        const remainingDays =
+                          new Date(
+                            new Date().getFullYear(),
+                            new Date().getMonth() + 1,
+                            0
+                          ).getDate() - new Date().getDate();
+                        return remainingDays > 0
+                          ? (remainingBudget / remainingDays).toLocaleString()
+                          : 0;
+                      })()}
+                      원
+                    </span>{' '}
+                    이하로 써야 예산을 지킬 수 있어요!
+                  </p>
+                )}
               </div>
             </div>
           </div>
