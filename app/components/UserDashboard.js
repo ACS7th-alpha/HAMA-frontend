@@ -9,6 +9,10 @@ export default function UserDashboard({
     ? Math.min((monthlySpending / userInfo.monthlyBudget) * 100, 100)
     : 0;
 
+  const spendingPercentage2 = userInfo.monthlyBudget
+    ? Math.floor((monthlySpending / userInfo.monthlyBudget) * 100)
+    : 0;
+
   return (
     <div className="bg-gradient-to-b from-pink-50 to-yellow-50 w-full">
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -58,11 +62,41 @@ export default function UserDashboard({
                     <span className="mr-1">💸</span> 사용:{' '}
                     {monthlySpending.toLocaleString()}원
                   </span>
-                  <span className="flex items-center">
-                    <span className="mr-1">✨</span> 남은:{' '}
-                    {remainingBudget.toLocaleString()}원
+                  <span className="flex items-center ml-4">
+                    <span className="mr-1">✨</span> 사용:{' '}
+                    {spendingPercentage2.toLocaleString()}%{' '}
+                    <span className="text-gray-600 ml-2">
+                      {remainingBudget.toLocaleString()}원
+                    </span>
                   </span>
                 </div>
+              </div>
+
+              {/* 새로운 귀여운 네모 칸 추가 */}
+              <div className="bg-white rounded-2xl p-4 mt-6 shadow-md border-2 border-blue-10">
+                <p className="text-xl font-semibold text-center">
+                  <span role="img" aria-label="pig">
+                    🐻
+                  </span>{' '}
+                  하루에{' '}
+                  <span className="text-green-500 font-bold text-lg">
+                    {(() => {
+                      const remainingBudget =
+                        userInfo.monthlyBudget - monthlySpending;
+                      const remainingDays =
+                        new Date(
+                          new Date().getFullYear(),
+                          new Date().getMonth() + 1,
+                          0
+                        ).getDate() - new Date().getDate();
+                      return remainingDays > 0
+                        ? (remainingBudget / remainingDays).toLocaleString()
+                        : 0;
+                    })()}
+                    원
+                  </span>{' '}
+                  이하로 써야 예산을 지킬 수 있어요!
+                </p>
               </div>
             </div>
           </div>

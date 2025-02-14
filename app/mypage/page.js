@@ -18,6 +18,9 @@ export default function MyPage() {
     gender: 'male',
   }); // 새로운 자녀 정보 상태
   const [isAddingChild, setIsAddingChild] = useState(false); // 추가 모드 상태
+  const [isEditing, setIsEditing] = useState(false);
+  const [newNickname, setNewNickname] = useState(userInfo?.nickname || '');
+  const [newBudget, setNewBudget] = useState(userInfo?.monthlyBudget || 0);
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -340,6 +343,50 @@ export default function MyPage() {
     setIsAddingChild(false); // 추가 모드 비활성화
   };
 
+  const handleEditProfile = () => {
+    setIsEditing(true);
+    setNewNickname(userInfo.nickname);
+    setNewBudget(userInfo.monthlyBudget);
+  };
+
+  const handleSaveProfile = async () => {
+    const accessToken = localStorage.getItem('access_token');
+
+    try {
+      const response = await fetch('http://localhost:3001/auth/update', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          nickname: newNickname,
+          monthlyBudget: newBudget,
+        }),
+      });
+
+      const data = await response.json();
+      console.log('Response from server:', data); // 서버 응답 로그
+
+      if (response.ok) {
+        // 로컬 저장소에 사용자 정보 업데이트
+        localStorage.setItem('user', JSON.stringify(data.user));
+        setUserInfo(data.user);
+        setIsEditing(false);
+      } else {
+        console.error('Error updating user:', data.message);
+      }
+    } catch (error) {
+      console.error('Error updating user:', error);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setNewNickname(userInfo.nickname);
+    setNewBudget(userInfo.monthlyBudget);
+  };
+
   if (!userInfo) {
     return (
       <div className="min-h-screen bg-pink-50">
@@ -430,11 +477,60 @@ export default function MyPage() {
                 <div>
                   <p className="text-gray-600 mb-2">이메일</p>
                   <p className="text-lg font-semibold">{userInfo.email}</p>
+                  <div className="mt-4">
+                    <p className="text-gray-600 mb-2">당월 예산</p>
+                    {isEditing ? (
+                      <input
+                        type="number"
+                        value={newBudget}
+                        onChange={(e) => setNewBudget(e.target.value)}
+                        className="border border-gray-300 rounded-md p-2 w-full"
+                      />
+                    ) : (
+                      <p className="text-lg font-semibold">
+                        {userInfo.monthlyBudget.toLocaleString()}원
+                      </p>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <p className="text-gray-600 mb-2">닉네임</p>
-                  <p className="text-lg font-semibold">{userInfo.nickname}</p>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={newNickname}
+                      onChange={(e) => setNewNickname(e.target.value)}
+                      className="border border-gray-300 rounded-md p-2 w-full"
+                    />
+                  ) : (
+                    <p className="text-lg font-semibold">{userInfo.nickname}</p>
+                  )}
                 </div>
+              </div>
+              <div className="flex justify-end">
+                {isEditing ? (
+                  <>
+                    <button
+                      onClick={handleSaveProfile}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors h-10"
+                    >
+                      저장
+                    </button>
+                    <button
+                      onClick={handleCancelEdit}
+                      className="ml-2 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors h-10"
+                    >
+                      취소
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={handleEditProfile}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors h-10"
+                  >
+                    수정
+                  </button>
+                )}
               </div>
             </div>
           )}
