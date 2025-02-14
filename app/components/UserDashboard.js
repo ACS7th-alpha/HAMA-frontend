@@ -81,7 +81,7 @@ export default function UserDashboard({
                 ) : (
                   <p className="text-xl font-semibold text-center">
                     <span role="img" aria-label="pig">
-                      🐷
+                      🐻
                     </span>{' '}
                     하루에{' '}
                     <span className="text-green-500 font-bold text-lg">
