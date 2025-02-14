@@ -243,7 +243,7 @@ export default function Header({ onLogin }) {
             <nav className="flex items-center gap-1">
               {/* 장바구니 버튼 */}
               <Link
-                href="/cart"
+                href="/shoppingcart"
                 className="flex flex-col items-center gap-2 px-4 py-2 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
               >
                 <span className="text-xl">🛒</span>

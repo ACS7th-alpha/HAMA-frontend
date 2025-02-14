@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -16,7 +16,6 @@ export default function CategoryProduct() {
 
   // 카테고리 목록 정의
   const categories = [
-
     { id: '수유_이유용품', name: '수유/이유용품', icon: '🍼' },
     { id: '기저귀_물티슈', name: '기저귀/물티슈', icon: '👶' },
     { id: '스킨케어_화장품', name: '스킨케어/화장품', icon: '🧴' },
@@ -53,13 +52,13 @@ export default function CategoryProduct() {
         } else {
           url = `http://localhost:3007/products/category/${category}?page=${page}&limit=${limit}`;
         }
-        
+
         const response = await fetch(url);
         const data = await response.json();
         setProducts(Array.isArray(data.data) ? data.data : []);
-        setTotalPages(Math.ceil(data.total / limit));  // Calculate total pages
+        setTotalPages(Math.ceil(data.total / limit)); // Calculate total pages
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error('Error fetching products:', error);
         setProducts([]);
       } finally {
         setLoading(false);
@@ -82,43 +81,65 @@ export default function CategoryProduct() {
 
   const { startPage, endPage } = getPageRange();
 
+  // 컴포넌트 마운트 시 저장된 상태와 스크롤 위치 복원
+  useEffect(() => {
+    const savedPage = sessionStorage.getItem('prevPage');
+    const savedCategory = sessionStorage.getItem('prevCategory');
+    const savedScrollPosition = sessionStorage.getItem('scrollPosition');
+
+    if (savedPage) {
+      setPage(parseInt(savedPage));
+      sessionStorage.removeItem('prevPage');
+    }
+    if (savedCategory) {
+      setCategory(savedCategory);
+      sessionStorage.removeItem('prevCategory');
+    }
+    if (savedScrollPosition) {
+      // 약간의 지연을 주어 컨텐츠가 로드된 후 스크롤 위치를 복원
+      setTimeout(() => {
+        window.scrollTo(0, parseInt(savedScrollPosition));
+        sessionStorage.removeItem('scrollPosition');
+      }, 100);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-white">
       <div className="container max-w-6xl mx-auto px-4 py-12">
         <h1 className="text-3xl font-bold mb-8 text-gray-800 text-center flex items-center justify-center gap-3">
-
           <span className="text-3xl">
             {childName ? `${childName}맘 주목 카테고리` : '맘 주목 카테고리'}
           </span>
-
         </h1>
 
-{/* 카테고리 버튼 */}
+        {/* 카테고리 버튼 */}
         <div className="mb-24">
-        <div className="flex flex-wrap justify-center gap-6">
+          <div className="flex flex-wrap justify-center gap-6">
             {categories.map((cat) => (
-            <div key={cat.id} className="flex flex-col items-center gap-2">
+              <div key={cat.id} className="flex flex-col items-center gap-2">
                 <button
-                onClick={() => handleCategoryClick(cat.id)}
-                className={`
+                  onClick={() => handleCategoryClick(cat.id)}
+                  className={`
                     w-20 h-20 // 동그라미 크기 조정
                     rounded-full 
                     flex items-center justify-center
                     transition-all duration-200
-                    ${category === cat.id 
-                    ? 'bg-pink-400 text-white shadow-lg transform scale-110' 
-                    : 'bg-pink-50 text-gray-700 hover:bg-pink-100 hover:scale-105'
+                    ${
+                      category === cat.id
+                        ? 'bg-pink-400 text-white shadow-lg transform scale-110'
+                        : 'bg-pink-50 text-gray-700 hover:bg-pink-100 hover:scale-105'
                     }
                 `}
                 >
-                <span className="text-2xl">{cat.icon}</span>
+                  <span className="text-2xl">{cat.icon}</span>
                 </button>
                 <span className="text-l font-medium text-gray-700">
-                {cat.name}
+                  {cat.name}
                 </span>
-            </div>
+              </div>
             ))}
-        </div>
+          </div>
         </div>
 
         {/* 상품 목록 */}
@@ -130,15 +151,15 @@ export default function CategoryProduct() {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {products.map((product) => (
-                <div 
-                  key={product.uid} 
+                <div
+                  key={product.uid}
                   className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border-2 border-pink-100 hover:border-pink-200"
                 >
                   <div className="relative group">
                     <div className="aspect-square overflow-hidden">
-                      <img 
-                        src={product.img} 
-                        alt={product.name} 
+                      <img
+                        src={product.img}
+                        alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
@@ -155,17 +176,27 @@ export default function CategoryProduct() {
                     </h2>
                     <div className="flex justify-between items-end">
                       <div>
-                        <p className="text-sm text-gray-500 mb-1">{product.site}</p>
+                        <p className="text-sm text-gray-500 mb-1">
+                          {product.site}
+                        </p>
                         <p className="text-xl font-bold text-black">
                           {product.sale_price}
                         </p>
                       </div>
-                      <Link
-                        href={`/product/${product.uid}`}
+                      <button
+                        onClick={() => {
+                          sessionStorage.setItem('prevPage', page.toString());
+                          sessionStorage.setItem('prevCategory', category);
+                          sessionStorage.setItem(
+                            'scrollPosition',
+                            window.scrollY.toString()
+                          );
+                          router.push(`/product/${product.uid}`);
+                        }}
                         className="flex items-center gap-1 bg-orange-100 hover:bg-pink-200 text-orange-600 px-4 py-2 rounded-full text-xs font-medium transition-colors duration-200"
                       >
                         자세히 보기 <span>→</span>
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -174,10 +205,11 @@ export default function CategoryProduct() {
 
             {products.length === 0 && (
               <div className="text-center py-20">
-                <p className="text-gray-500">해당 카테고리의 상품이 없습니다 🎈</p>
+                <p className="text-gray-500">
+                  해당 카테고리의 상품이 없습니다 🎈
+                </p>
               </div>
             )}
-
 
             {products.length > 0 && (
               <div className="flex justify-center items-center gap-1 mt-12">
@@ -191,11 +223,16 @@ export default function CategoryProduct() {
 
                 {/* 페이지 번호 목록 */}
                 <div className="flex gap-1">
-                  {Array.from({ length: endPage - startPage + 1 }, (_, idx) => startPage + idx).map((n) => (
+                  {Array.from(
+                    { length: endPage - startPage + 1 },
+                    (_, idx) => startPage + idx
+                  ).map((n) => (
                     <button
                       key={n}
                       onClick={() => setPage(n)}
-                      className={`rounded-full text-pink-600 font-medium ${page === n ? 'bg-pink-100' : 'bg-white hover:bg-pink-50'}`}
+                      className={`rounded-full text-pink-600 font-medium ${
+                        page === n ? 'bg-pink-100' : 'bg-white hover:bg-pink-50'
+                      }`}
                     >
                       {n}
                     </button>

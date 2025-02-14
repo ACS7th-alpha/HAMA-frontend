@@ -14,6 +14,7 @@ export default function ProductDetail() {
   const params = useParams();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const userInfo = JSON.parse(localStorage.getItem('user'));
+  const [token, setToken] = useState(null); // token state 추가
 
   const categoryIcons = {
     기저귀_물티슈: '👶',
@@ -21,6 +22,49 @@ export default function ProductDetail() {
     수유_이유용품: '🍼',
     스킨케어_화장품: '🧴',
     침구류: '🛏️',
+  };
+
+  const handleAddToCart = async () => {
+    try {
+      // 로컬 스토리지에서 토큰 가져오기
+      const accessToken = localStorage.getItem('access_token'); // 액세스 토큰 가져오기
+      if (!accessToken) {
+        alert('로그인이 필요한 서비스입니다.');
+        return;
+      }
+
+      // POST 요청으로 상품을 장바구니에 추가
+      const response = await fetch(`http://localhost:3008/cart/add`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          site: product.site,
+          category: product.category,
+          link: product.link,
+          uid: product.uid,
+          name: product.name,
+          brand: product.brand,
+          sale_price: product.sale_price,
+          img: product.img,
+          quantity: 1 // 기본값 1로 설정
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert('상품이 장바구니에 담겼습니다.');
+        router.push('/shoppingcart');
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || '장바구니 담기에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('장바구니 담기 오류:', error);
+      alert('장바구니 담기에 실패했습니다.');
+    }
   };
 
   useEffect(() => {
@@ -164,6 +208,17 @@ export default function ProductDetail() {
                   </p>
                 </div>
               </div>
+              <div className="flex gap-4 mt-8">
+                <button
+                  onClick={handleAddToCart}
+                  className="flex-1 bg-pink-500 text-white py-3 px-6 rounded-full hover:bg-pink-600 transition-colors duration-200"
+                >
+                  장바구니 담기
+                </button>
+              </div>
+
+
+
 
               {/* 구매 버튼 섹션 */}
               <div className="space-y-4">
