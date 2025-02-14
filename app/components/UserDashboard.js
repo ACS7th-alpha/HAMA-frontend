@@ -13,6 +13,10 @@ export default function UserDashboard({
     ? Math.floor((monthlySpending / userInfo.monthlyBudget) * 100)
     : 0;
 
+  const spendingPercentage2 = userInfo.monthlyBudget
+    ? Math.floor((monthlySpending / userInfo.monthlyBudget) * 100)
+    : 0;
+
   return (
     <div className="bg-gradient-to-b from-pink-50 to-yellow-50 w-full">
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -68,6 +72,12 @@ export default function UserDashboard({
                     <span className="text-gray-600 ml-2">
                       {remainingBudget.toLocaleString()}원
                     </span>
+                  <span className="flex items-center ml-4">
+                    <span className="mr-1">✨</span> 사용:{' '}
+                    {spendingPercentage2.toLocaleString()}%{' '}
+                    <span className="text-gray-600 ml-2">
+                      {remainingBudget.toLocaleString()}원
+                    </span>
                   </span>
                 </div>
               </div>
@@ -95,7 +105,10 @@ export default function UserDashboard({
                             0
                           ).getDate() - new Date().getDate();
                         return remainingDays > 0
-                          ? (remainingBudget / remainingDays).toLocaleString()
+                          ? (remainingBudget / remainingDays).toLocaleString(
+                              undefined,
+                              { maximumFractionDigits: 0 }
+                            )
                           : 0;
                       })()}
                       원
