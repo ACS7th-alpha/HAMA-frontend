@@ -6,7 +6,6 @@ import Header from './components/Header';
 import Loading from './components/Loading';
 import HeroSection from './components/HeroSection';
 import ConsumptionAnalysis from './components/ConsumptionAnalysis';
-import ProductRecommendations from './components/ProductRecommendations';
 import Footer from './components/Footer';
 import ProductList from './product/page';
 

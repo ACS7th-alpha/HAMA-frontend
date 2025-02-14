@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Pie, Doughnut, Bar } from 'react-chartjs-2';
+import { Pie, Doughnut, Bar, Line } from 'react-chartjs-2';
 import Header from '@/app/components/Header';
 import {
   Chart as ChartJS,
@@ -240,6 +240,85 @@ export default function StatisticsPage() {
     ],
   };
 
+  const processMonthlyComparison = (spendingData) => {
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+    const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
+    // 현재 월과 이전 월의 일별 지출 데이터 초기화
+    const daysInCurrentMonth = new Date(
+      currentYear,
+      currentMonth + 1,
+      0
+    ).getDate();
+    const daysInPrevMonth = new Date(prevYear, prevMonth + 1, 0).getDate();
+
+    const currentMonthData = Array(daysInCurrentMonth).fill(0);
+    const prevMonthData = Array(daysInPrevMonth).fill(0);
+
+    // 지출 데이터 처리
+    spendingData.forEach((category) => {
+      category.details.forEach((detail) => {
+        const date = new Date(detail.date);
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const day = date.getDate();
+
+        if (year === currentYear && month === currentMonth) {
+          currentMonthData[day - 1] += detail.amount;
+        } else if (year === prevYear && month === prevMonth) {
+          prevMonthData[day - 1] += detail.amount;
+        }
+      });
+    });
+
+    // 누적 합계 계산
+    let currentSum = 0;
+    let prevSum = 0;
+    const currentCumulative = currentMonthData.map(
+      (amount) => (currentSum += amount)
+    );
+    const prevCumulative = prevMonthData.map((amount) => (prevSum += amount));
+
+    return {
+      currentMonth: currentCumulative,
+      prevMonth: prevCumulative,
+      daysInCurrentMonth,
+      daysInPrevMonth,
+    };
+  };
+
+  const getComparisonChartData = (comparisonData) => {
+    const { currentMonth, prevMonth, daysInCurrentMonth, daysInPrevMonth } =
+      comparisonData;
+
+    return {
+      labels: Array.from(
+        { length: Math.max(daysInCurrentMonth, daysInPrevMonth) },
+        (_, i) => i + 1
+      ),
+      datasets: [
+        {
+          label: `${currentDate.getMonth() + 1}월`,
+          data: currentMonth,
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.1,
+          fill: false,
+        },
+        {
+          label: `${
+            currentDate.getMonth() === 0 ? 12 : currentDate.getMonth()
+          }월`,
+          data: prevMonth,
+          borderColor: 'rgb(201, 203, 207)',
+          tension: 0.1,
+          fill: false,
+        },
+      ],
+    };
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -417,6 +496,255 @@ export default function StatisticsPage() {
                 {yearlyData.reduce((a, b) => a + b, 0).toLocaleString()}원
               </p>
             </div>
+          </div>
+
+          {/* 월별 비교 차트 */}
+          <div className="bg-white rounded-lg p-6 shadow-md mt-6 max-w-4xl mx-auto">
+            <h3 className="text-xl font-semibold text-black mb-4">
+              기간별 지출액 비교
+            </h3>
+            {monthlySpending > 0 ||
+            yearlyData[currentDate.getMonth() - 1] > 0 ? (
+              <>
+                {(() => {
+                  const comparisonData = processMonthlyComparison(categoryData);
+                  const { daysInCurrentMonth } = comparisonData;
+                  const today = new Date().getDate();
+                  const currentMonthSpendingToDate =
+                    comparisonData.currentMonth[today - 1] || 0;
+                  const prevMonthSpendingToDate =
+                    comparisonData.prevMonth[today - 1] || 0;
+                  const difference =
+                    currentMonthSpendingToDate - prevMonthSpendingToDate;
+                  const percentChange =
+                    prevMonthSpendingToDate !== 0
+                      ? (difference / prevMonthSpendingToDate) * 100
+                      : 100;
+
+                  return (
+                    <>
+                      <div className="mb-6 text-center space-y-3">
+                        <p className="text-gray-700 font-medium flex items-center justify-center gap-2">
+                          <span className="text-pink-500">🗓️</span>
+                          {today}일 기준
+                        </p>
+                        <div className="flex justify-center items-center gap-4">
+                          <div className="text-sm space-y-1 bg-blue-50 rounded-xl px-6 py-3">
+                            <p>
+                              <span className="text-gray-600">
+                                이번달 총 지출
+                              </span>{' '}
+                              <span className="text-blue-600 font-semibold">
+                                💙 {currentMonthSpendingToDate.toLocaleString()}
+                                원
+                              </span>
+                            </p>
+                            <p>
+                              <span className="text-gray-600">
+                                지난달 총 지출
+                              </span>{' '}
+                              <span className="text-gray-600 font-semibold">
+                                💭 {prevMonthSpendingToDate.toLocaleString()}원
+                              </span>
+                            </p>
+                          </div>
+                        </div>
+                        <p className="text-lg font-medium bg-gray-50 rounded-2xl px-6 py-4 inline-block">
+                          {difference > 0 ? (
+                            <>
+                              <span className="text-pink-500"></span> 지난달보다{' '}
+                              <span className={`font-bold text-red-500`}>
+                                {Math.abs(difference).toLocaleString()}원
+                              </span>
+                              을{' '}
+                              <span className="text-red-500 font-semibold">
+                                더 많이
+                              </span>{' '}
+                              썼어요!
+                              <span className={`text-sm ml-2 text-red-500`}>
+                                (+{percentChange.toFixed(1)}%)
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-blue-500"></span> 지난달보다{' '}
+                              <span className={`font-bold text-blue-500`}>
+                                {Math.abs(difference).toLocaleString()}원
+                              </span>
+                              을{' '}
+                              <span className="text-blue-500 font-semibold">
+                                덜
+                              </span>{' '}
+                              썼어요!
+                              <span className={`text-sm ml-2 text-blue-500`}>
+                                ({percentChange.toFixed(1)}%)
+                              </span>
+                            </>
+                          )}
+                          <br />
+                          <span className="text-sm text-gray-500 mt-1 block">
+                            {difference > 0
+                              ? '아기를 위한 소중한 지출이네요! 👶'
+                              : '절약을 잘 하고 계시네요! ✨'}
+                          </span>
+                        </p>
+                      </div>
+                      <div className="h-[300px]">
+                        <Line
+                          data={{
+                            labels: Array.from(
+                              { length: daysInCurrentMonth },
+                              (_, i) => i + 1
+                            ),
+                            datasets: [
+                              {
+                                label: `${currentDate.getMonth() + 1}월`,
+                                data: comparisonData.currentMonth,
+                                borderColor: 'rgba(53, 162, 235, 0.8)',
+                                backgroundColor: 'rgba(53, 162, 235, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.4,
+                                fill: true,
+                                pointRadius: 0,
+                                pointHoverRadius: 6,
+                                pointHoverBackgroundColor:
+                                  'rgba(53, 162, 235, 1)',
+                                pointHoverBorderColor: 'white',
+                                pointHoverBorderWidth: 2,
+                              },
+                              {
+                                label: `${
+                                  currentDate.getMonth() === 0
+                                    ? 12
+                                    : currentDate.getMonth()
+                                }월`,
+                                data: comparisonData.prevMonth,
+                                borderColor: 'rgba(255, 99, 132, 0.8)',
+                                backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.4,
+                                fill: true,
+                                pointRadius: 0,
+                                pointHoverRadius: 6,
+                                pointHoverBackgroundColor:
+                                  'rgba(255, 99, 132, 1)',
+                                pointHoverBorderColor: 'white',
+                                pointHoverBorderWidth: 2,
+                              },
+                            ],
+                          }}
+                          options={{
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                              y: {
+                                beginAtZero: true,
+                                grid: {
+                                  color: 'rgba(0, 0, 0, 0.05)',
+                                  drawBorder: false,
+                                },
+                                ticks: {
+                                  callback: (value) =>
+                                    `${value.toLocaleString()}원`,
+                                  font: {
+                                    size: 11,
+                                  },
+                                },
+                              },
+                              x: {
+                                title: {
+                                  display: true,
+                                  text: '일자',
+                                  font: {
+                                    size: 12,
+                                    weight: 'bold',
+                                  },
+                                },
+                                grid: {
+                                  display: true,
+                                  drawBorder: false,
+                                  color: function (context) {
+                                    const day =
+                                      parseInt(context.tick.value) + 1;
+                                    return day === 1 ||
+                                      day === 15 ||
+                                      day === daysInCurrentMonth
+                                      ? 'rgba(0, 0, 0, 0.1)'
+                                      : 'rgba(0, 0, 0, 0.03)';
+                                  },
+                                },
+                                ticks: {
+                                  callback: function (value) {
+                                    const day = parseInt(value) + 1;
+                                    if (
+                                      day === 1 ||
+                                      day === 15 ||
+                                      day === daysInCurrentMonth
+                                    ) {
+                                      return `${day}일`;
+                                    }
+                                    return '';
+                                  },
+                                  autoSkip: false,
+                                  font: {
+                                    size: 11,
+                                  },
+                                },
+                              },
+                            },
+                            plugins: {
+                              legend: {
+                                position: 'top',
+                                labels: {
+                                  usePointStyle: true,
+                                  padding: 20,
+                                  font: {
+                                    size: 12,
+                                  },
+                                },
+                              },
+                              tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                titleColor: '#333',
+                                titleFont: {
+                                  size: 13,
+                                  weight: 'normal',
+                                },
+                                bodyColor: '#666',
+                                bodyFont: {
+                                  size: 12,
+                                },
+                                padding: 12,
+                                borderColor: 'rgba(0, 0, 0, 0.1)',
+                                borderWidth: 1,
+                                callbacks: {
+                                  label: function (context) {
+                                    const label = context.dataset.label || '';
+                                    const value = context.parsed.y;
+                                    return `${label}: ${value.toLocaleString()}원`;
+                                  },
+                                },
+                              },
+                            },
+                            interaction: {
+                              intersect: false,
+                              mode: 'index',
+                            },
+                          }}
+                        />
+                      </div>
+                    </>
+                  );
+                })()}
+              </>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <p>아직 비교할 수 있는 데이터가 없습니다.</p>
+                <p className="mt-2">
+                  지출을 기록하시면 월별 비교 차트를 확인하실 수 있습니다.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </main>
