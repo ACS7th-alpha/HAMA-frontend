@@ -489,7 +489,8 @@ export default function StatisticsPage() {
             </div>
             <div className="mt-4 text-center">
               <p className="text-gray-600">
-                월별 예산: {user?.monthlyBudget?.toLocaleString()}원
+                월별 예산:{' '}
+                {Number(user?.monthlyBudget)?.toLocaleString('ko-KR')}원
               </p>
               <p className="text-gray-600">
                 연간 총 지출:{' '}

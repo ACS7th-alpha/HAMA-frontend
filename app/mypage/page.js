@@ -488,7 +488,10 @@ export default function MyPage() {
                       />
                     ) : (
                       <p className="text-lg font-semibold">
-                        {userInfo.monthlyBudget.toLocaleString()}원
+                        {Number(userInfo.monthlyBudget)?.toLocaleString(
+                          'ko-KR'
+                        )}
+                        원
                       </p>
                     )}
                   </div>

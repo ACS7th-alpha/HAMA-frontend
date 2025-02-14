@@ -511,7 +511,7 @@ export default function BudgetPage() {
             <div className="bg-white rounded-lg p-6 shadow-md w-40">
               <div className="text-gray-600 mb-1 text-center">당월 예산</div>
               <div className="font-bold text-black text-center">
-                {monthlyBudget.toLocaleString()}원
+                {Number(monthlyBudget).toLocaleString()}원
               </div>
             </div>
 

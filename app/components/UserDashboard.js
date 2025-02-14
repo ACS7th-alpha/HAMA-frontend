@@ -48,7 +48,7 @@ export default function UserDashboard({
                     <span className="mr-2">💰</span> 이번 달 예산
                   </p>
                   <p className="text-3xl font-bold text-black mt-2">
-                    {userInfo.monthlyBudget?.toLocaleString()}원
+                    {Number(userInfo.monthlyBudget)?.toLocaleString('ko-KR')}원
                   </p>
                 </div>
                 <div className="w-full h-5 bg-white rounded-full overflow-hidden mt-4 shadow-inner">

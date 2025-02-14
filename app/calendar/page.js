@@ -689,7 +689,7 @@ export default function CalendarPage() {
             <div className="bg-white p-6 rounded-lg shadow">
               <h3 className="text-lg font-semibold mb-2 text-black">예산</h3>
               <p className="text-2xl font-bold text-blue-600">
-                {user?.monthlyBudget?.toLocaleString() || 0}원
+                {Number(user?.monthlyBudget)?.toLocaleString('ko-KR') || 0}원
               </p>
             </div>
             <div className="bg-white p-6 rounded-lg shadow">
