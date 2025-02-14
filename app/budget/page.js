@@ -565,7 +565,7 @@ export default function BudgetPage() {
           <div className="flex flex-col gap-4">
             {categories.map((category, index) => {
               const spent = categorySpending[category.name] || 0;
-              const remaining = category.budget;
+              const remaining = category.budget - spent;
               const percentage = calculatePercentage(spent, category.budget);
               const isOverBudget = spent > category.budget;
 
@@ -595,7 +595,7 @@ export default function BudgetPage() {
                     </div>
 
                     <div
-                      className="flex-1 bg-white rounded-lg p-6 shadow-md cursor-pointer hover:bg-gray-50"
+                      className="flex-1 bg-white rounded-lg p-6 shadow-md flex items-center cursor-pointer hover:bg-gray-50 transition-transform duration-300 transform hover:scale-105"
                       onClick={() => handleCategoryClick(category.name)}
                     >
                       <div className="relative w-full">
