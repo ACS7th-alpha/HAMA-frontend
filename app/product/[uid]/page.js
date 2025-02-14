@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useEffect, useState } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import Header from '@/app/components/Header';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
@@ -12,13 +12,15 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const params = useParams();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const userInfo = JSON.parse(localStorage.getItem('user'));
 
   const categoryIcons = {
-    '기저귀_물티슈': '👶',
-    '생활_위생용품': '🧼',
-    '수유_이유용품': '🍼',
-    '스킨케어_화장품': '🧴',
-    '침구류': '🛏️',
+    기저귀_물티슈: '👶',
+    생활_위생용품: '🧼',
+    수유_이유용품: '🍼',
+    스킨케어_화장품: '🧴',
+    침구류: '🛏️',
   };
 
   useEffect(() => {
@@ -27,13 +29,15 @@ export default function ProductDetail() {
 
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:3007/products/${params.uid}`);
-        if (!response.ok) throw new Error("상품을 불러올 수 없습니다.");
-        
+        const response = await fetch(
+          `http://localhost:3007/products/${params.uid}`
+        );
+        if (!response.ok) throw new Error('상품을 불러올 수 없습니다.');
+
         const data = await response.json();
-        setProduct(data);  // 배열이 아니라 단일 객체로 받음
+        setProduct(data); // 배열이 아니라 단일 객체로 받음
       } catch (error) {
-        console.error("Error fetching product:", error);
+        console.error('Error fetching product:', error);
         setProduct(null);
       } finally {
         setLoading(false);
@@ -41,7 +45,13 @@ export default function ProductDetail() {
     }
 
     fetchProduct();
-  }, [params?.uid]);  // params.uid 변경 시 다시 요청
+  }, [params?.uid]); // params.uid 변경 시 다시 요청
+
+  useEffect(() => {
+    if (userInfo) {
+      setIsLoggedIn(true);
+    }
+  }, [userInfo]);
 
   // 리뷰 데이터 존재 여부 확인
   const hasReviewData = product?.additionalInfo?.review_summary;
@@ -73,26 +83,28 @@ export default function ProductDetail() {
   // 각 카테고리별 도넛 차트 데이터 생성 함수
   const createChartData = (value, color) => ({
     labels: ['', ''],
-    datasets: [{
-      data: [value, 100 - value],
-      backgroundColor: [
-        color,
-        'rgba(229, 231, 235, 0.5)', // 회색 배경
-      ],
-      borderWidth: 0,
-      borderRadius: 20,
-    }]
+    datasets: [
+      {
+        data: [value, 100 - value],
+        backgroundColor: [
+          color,
+          'rgba(229, 231, 235, 0.5)', // 회색 배경
+        ],
+        borderWidth: 0,
+        borderRadius: 20,
+      },
+    ],
   });
 
   // 차트 옵션
   const chartOptions = {
     plugins: {
       legend: {
-        display: false
+        display: false,
       },
       tooltip: {
-        enabled: false
-      }
+        enabled: false,
+      },
     },
     cutout: '75%',
     responsive: true,
@@ -100,7 +112,7 @@ export default function ProductDetail() {
   };
   return (
     <div className="min-h-screen bg-white">
-    <Header />
+      <Header />
       <div className="container max-w-5xl mx-auto px-4 py-12">
         {/* 상단 네비게이션 */}
         <button
@@ -126,7 +138,7 @@ export default function ProductDetail() {
             {/* 상품 정보 섹션 */}
 
             <div className="md:w-1/2 p-8">
-              {/* 카테고리 뱃지 추가 */}  
+              {/* 카테고리 뱃지 추가 */}
               <div className="flex items-center gap-2 mb-4">
                 <span className="inline-block bg-pink-100 px-4 py-1 rounded-full text-sm font-medium">
                   {categoryIcons[product.category] || '🎁'} {product.category}
@@ -163,7 +175,7 @@ export default function ProductDetail() {
                 >
                   구매하러 가기
                 </a>
-        
+
                 {/* 추가 정보 */}
                 <div className="bg-blue-50 rounded-2xl p-4 text-sm text-gray-600">
                   <div className="flex items-center gap-2 mb-2">
@@ -180,13 +192,28 @@ export default function ProductDetail() {
           </div>
         </div>
 
-
-
         {/* 리뷰 섹션 - 조건부 렌더링 */}
         {hasReviewData && (
-          <div className="mt-12 bg-white rounded-3xl shadow-lg p-8">
+          <div className="mt-12 bg-white rounded-3xl shadow-lg p-8 relative">
+            {/* 로그인하지 않은 경우 블러 처리 및 알림 */}
+            {!isLoggedIn && (
+              <>
+                {/* 블러 레이어 */}
+                <div className="absolute inset-0 bg-white/30 backdrop-blur-md rounded-3xl z-40" />
+                {/* 컨텐츠 레이어 */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center z-50 p-8">
+                  <div className="text-6xl mb-4">🔒</div>
+                  <h3 className="text-xl font-bold text-gray-800 mb-2">
+                    로그인이 필요한 기능입니다
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    상세한 리뷰 분석을 보시려면 로그인해 주세요
+                  </p>
+                </div>
+              </>
+            )}
             <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center flex items-center justify-center gap-2">
-              <span className="text-2xl">✨</span> 
+              <span className="text-2xl">✨</span>
               실제 구매자 리뷰 분석
               <span className="text-2xl">✨</span>
             </h2>
@@ -195,16 +222,19 @@ export default function ProductDetail() {
               {/* 긍정적 리뷰 차트 */}
               <div className=" rounded-2xl p-6 relative">
                 <div className="w-40 h-40 mx-auto">
-                  <Doughnut 
+                  <Doughnut
                     data={createChartData(
                       product.additionalInfo.review_percent.positive,
                       'rgba(34, 197, 94, 0.8)' // 녹색
-                    )} 
+                    )}
                     options={chartOptions}
                   />
                   <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
                     <div className="text-2xl font-bold text-green-600">
-                      {product.additionalInfo.review_percent.positive?.toFixed(1)}%
+                      {product.additionalInfo.review_percent.positive?.toFixed(
+                        1
+                      )}
+                      %
                     </div>
                     <div className="text-sm text-gray-600">긍정적</div>
                   </div>
@@ -214,16 +244,19 @@ export default function ProductDetail() {
               {/* 부정적 리뷰 차트 */}
               <div className="rounded-2xl p-6 relative">
                 <div className="w-40 h-40 mx-auto">
-                  <Doughnut 
+                  <Doughnut
                     data={createChartData(
                       product.additionalInfo.review_percent.negative,
                       'rgba(239, 68, 68, 0.8)' // 빨간색
-                    )} 
+                    )}
                     options={chartOptions}
                   />
                   <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
                     <div className="text-2xl font-bold text-red-600">
-                      {product.additionalInfo.review_percent.negative?.toFixed(1)}%
+                      {product.additionalInfo.review_percent.negative?.toFixed(
+                        1
+                      )}
+                      %
                     </div>
                     <div className="text-sm text-gray-600">부정적</div>
                   </div>
@@ -233,16 +266,19 @@ export default function ProductDetail() {
               {/* 중립적 리뷰 차트 */}
               <div className=" rounded-2xl p-6 relative">
                 <div className="w-40 h-40 mx-auto">
-                  <Doughnut 
+                  <Doughnut
                     data={createChartData(
                       product.additionalInfo.review_percent.neutral,
                       'rgba(156, 163, 175, 0.8)' // 회색
-                    )} 
+                    )}
                     options={chartOptions}
                   />
                   <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
                     <div className="text-2xl font-bold text-gray-600">
-                      {product.additionalInfo.review_percent.neutral?.toFixed(1)}%
+                      {product.additionalInfo.review_percent.neutral?.toFixed(
+                        1
+                      )}
+                      %
                     </div>
                     <div className="text-sm text-gray-600">중립적</div>
                   </div>
@@ -259,21 +295,24 @@ export default function ProductDetail() {
                   <span>이런 점이 좋아요!</span>
                 </h3>
                 <div className="grid gap-3 pl-4">
-                  {product.additionalInfo.review_summary.advantages.map((advantage, index) => (
-                    <div 
-                      key={index} 
-                      className="flex items-center gap-3 bg-white p-4 rounded-xl border border-green-100 hover:border-green-200 transition-colors"
-                    >
-                      <span className="text-green-500 font-bold">✓</span>
-                      <span className="text-gray-700">{advantage}</span>
-                    </div>
-                  ))}
+                  {product.additionalInfo.review_summary.advantages.map(
+                    (advantage, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center gap-3 bg-white p-4 rounded-xl border border-green-100 hover:border-green-200 transition-colors"
+                      >
+                        <span className="text-green-500 font-bold">✓</span>
+                        <span className="text-gray-700">{advantage}</span>
+                      </div>
+                    )
+                  )}
                 </div>
               </div>
             )}
 
             {/* 단점 */}
-            {product.additionalInfo.review_summary.disadvantages?.length > 0 && (
+            {product.additionalInfo.review_summary.disadvantages?.length >
+              0 && (
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2 bg-red-50 p-4 rounded-xl">
                   <span className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white">
@@ -282,15 +321,17 @@ export default function ProductDetail() {
                   <span>이런 점은 아쉬워요</span>
                 </h3>
                 <div className="grid gap-3 pl-4">
-                  {product.additionalInfo.review_summary.disadvantages.map((disadvantage, index) => (
-                    <div 
-                      key={index} 
-                      className="flex items-center gap-3 bg-white p-4 rounded-xl border border-red-100 hover:border-red-200 transition-colors"
-                    >
-                      <span className="text-red-500 font-bold">!</span>
-                      <span className="text-gray-700">{disadvantage}</span>
-                    </div>
-                  ))}
+                  {product.additionalInfo.review_summary.disadvantages.map(
+                    (disadvantage, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center gap-3 bg-white p-4 rounded-xl border border-red-100 hover:border-red-200 transition-colors"
+                      >
+                        <span className="text-red-500 font-bold">!</span>
+                        <span className="text-gray-700">{disadvantage}</span>
+                      </div>
+                    )
+                  )}
                 </div>
               </div>
             )}
