@@ -231,7 +231,7 @@ export default function Header({ onLogin }) {
               text="signin_with"
               shape="rectangular"
               locale="ko"
-              width="300"
+              width="200"
               context="signin"
               theme="outline"
               size="large"
