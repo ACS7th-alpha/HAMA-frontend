@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'; // 라우터 추가
+import CartBasedRecommendation from './CartBasedRecommendation';
 
 export default function UserDashboard({
   userInfo,
@@ -264,8 +265,8 @@ export default function UserDashboard({
           </button>
         )}
         </div>
+        <CartBasedRecommendation />
       </div>
     </div>
   );
 }
-
