@@ -1,15 +1,16 @@
 'use client';
-
 import { useState, useEffect } from 'react';
 import Header from '@/app/components/Header';
 import Link from 'next/link';
 import ItemCard from '@/app/components/ItemCard';
 import ImageSlider from '@/app/components/ImageSlider';
+import { use } from 'react'; // import use from React
 
 export default function ProductDetail({ params }) {
+  const { id } = use(params); // Unwrap the params object
+
   const [product, setProduct] = useState(null);
   const [otherProducts, setOtherProducts] = useState([]); // 다른 글 목록을 위한 state
-  const { id } = params;
 
   // 현재 상품 정보 가져오기
   useEffect(() => {
