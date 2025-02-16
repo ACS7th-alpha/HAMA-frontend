@@ -2,11 +2,15 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/app/components/Header';
+import ExpenseModal from '@/app/components/ExpenseModal';
 
 export default function ShoppingCart() {
   const router = useRouter();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   useEffect(() => {
     fetchCartItems();
@@ -98,6 +102,11 @@ export default function ShoppingCart() {
     );
   }
 
+  const handleExpenseAdd = (item) => {
+    setSelectedItem(item);
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -145,9 +154,16 @@ export default function ShoppingCart() {
                   >
                     삭제
                   </button>
+                  <button
+                    onClick={() => handleExpenseAdd(item)}
+                    className="font-medium bg-pink-100 text-pink-600 px-4 py-2 rounded-full hover:bg-pink-200 transition-colors duration-200"
+                  >
+                    지출 추가
+                  </button>
                 </div>
               ))}
             </div>
+
 
             {/* 🔹 총 가격 표시 추가 */}
             <div className="mt-12 border-t border-gray-300 pt-6 text-center">
@@ -158,6 +174,12 @@ export default function ShoppingCart() {
           </>
         )}
       </div>
+      {/* 지출 추가 모달 */}
+      <ExpenseModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        item={selectedItem}
+      />
     </div>
   );
 }
