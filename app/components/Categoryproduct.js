@@ -105,7 +105,7 @@ export default function CategoryProduct() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white mt-12">
       <div className="container max-w-6xl mx-auto px-4 py-12">
         <h1 className="text-3xl font-bold mb-8 text-gray-800 text-center flex items-center justify-center gap-3">
           <span className="text-3xl">
@@ -114,7 +114,7 @@ export default function CategoryProduct() {
         </h1>
 
         {/* 카테고리 버튼 */}
-        <div className="mb-24">
+        <div className="mb-24 mt-12">
           <div className="flex flex-wrap justify-center gap-6">
             {categories.map((cat) => (
               <div key={cat.id} className="flex flex-col items-center gap-2">
@@ -127,8 +127,8 @@ export default function CategoryProduct() {
                     transition-all duration-200
                     ${
                       category === cat.id
-                        ? 'bg-pink-400 text-white shadow-lg transform scale-110'
-                        : 'bg-pink-50 text-gray-700 hover:bg-pink-100 hover:scale-105'
+                        ? 'bg-orange-400 text-white shadow-lg transform scale-110'
+                        : 'bg-orange-50 text-gray-700 hover:bg-pink-100 hover:scale-105'
                     }
                 `}
                 >

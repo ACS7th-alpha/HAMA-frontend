@@ -66,6 +66,7 @@ export default function CommunityPage() {
           <label className="text-xl flex items-center gap-2">
             <input
               type="checkbox"
+              className="peer scale-150 accent-orange-300"
               checked={showRecommended}
               onChange={() => setShowRecommended(!showRecommended)}
             />
@@ -74,6 +75,7 @@ export default function CommunityPage() {
           <label className="text-xl flex items-center gap-2">
             <input
               type="checkbox"
+              className="peer scale-150 accent-orange-300"
               checked={showNotRecommended}
               onChange={() => setShowNotRecommended(!showNotRecommended)}
             />
@@ -84,7 +86,7 @@ export default function CommunityPage() {
         {/* 글 작성 버튼 */}
         <Link
           href="/community/write"
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg float-right mb-4"
+          className="flex items-center gap-2 px-4 py-2 bg-orange-400 text-white rounded-xl float-right mb-4"
         >
           글 작성
         </Link>

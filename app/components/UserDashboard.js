@@ -14,7 +14,7 @@ export default function UserDashboard({
     : 0;
 
   return (
-    <div className="bg-gradient-to-b from-pink-50 to-yellow-50 w-full">
+    <div className="bg-gradient-to-b from-pink-50 to-yellow-50 w-3/4 mx-auto">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-3xl shadow-lg p-8">
           <div className="flex justify-between items-center">
@@ -79,7 +79,7 @@ export default function UserDashboard({
                     이번 달 예산을 다 쓰셔서, 아끼셔야 해요! 😢
                   </p>
                 ) : (
-                  <p className="text-xl font-semibold text-center">
+                  <p className="text-lg font-semibold text-center">
                     <span role="img" aria-label="pig">
                       🐻
                     </span>{' '}

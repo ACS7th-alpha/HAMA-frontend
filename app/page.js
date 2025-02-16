@@ -189,7 +189,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       <Header onLogin={handleGoogleSuccess} />
       <HeroSection
         userInfo={userInfo}
