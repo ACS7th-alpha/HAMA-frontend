@@ -60,9 +60,9 @@ export default function ProductDetail({ params }) {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white ">
       <Header />
-      <div className="max-w-5xl mx-auto p-6 bg-white rounded-lg mt-6">
+      <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg mt-6">
         {/* 기존 상품 상세 정보 */}
         <div className="mb-4">
           {product.recommended ? (
@@ -87,7 +87,7 @@ export default function ProductDetail({ params }) {
         </div>
 
         {/* 상품 정보 */}
-        <div className="space-y-6 bg-gray-50 p-6 rounded-lg mb-16">
+        <div className="space-y-6 bg-gray-50 p-12 rounded-lg mb-16">
           <div>
             <h2 className="text-lg font-semibold mb-2">사용 연령</h2>
             <p className="text-gray-700">{product.ageGroup}</p>

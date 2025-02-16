@@ -170,7 +170,7 @@ export default function CategoryProduct() {
                       />
                     </div>
                     <div className="absolute top-3 left-3">
-                      <span className="bg-white/90 backdrop-blur px-3 py-1 rounded-full text-l font-medium text-gray-700">
+                      <span className="bg-white/90 backdrop-blur px-3 py-1 rounded-full text-l font-medium text-gray-700 line-clamp-2">
                         {product.brand}
                       </span>
                     </div>

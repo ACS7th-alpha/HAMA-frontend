@@ -138,17 +138,17 @@ export default function ExpenseModal({ isOpen, onClose, item }) {
               required
             />
           </div>
-          <div className="flex justify-end gap-4 mt-6">
+          <div className="flex justify-end gap-1 mt-6">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors duration-200"
+              className="px-4 py-2 text-gray-600 bg-white hover:text-gray-800 transition-colors duration-200"
             >
               취소
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors duration-200"
+              className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors duration-200"
             >
               확인
             </button>

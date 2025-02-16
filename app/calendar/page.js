@@ -637,7 +637,7 @@ export default function CalendarPage() {
   return (  
     <div className="min-h-screen bg-white">
       <Header />
-      <main className="container mx-auto max-w-6xl">
+      <main className="container mx-auto max-w-5xl">
         <div className="bg-white rounded-lg shadow p-12">
           {/* 달력 헤더 */}
           <div className="flex justify-center items-center mb-6">
@@ -729,7 +729,7 @@ export default function CalendarPage() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
+                  <tbody className="divide-y divide-gray-200 whitespace-nowrap">
                     {selectedDateSpending.map((spending) => (
                       <tr key={spending.uid || spending.itemName}>
                         {spendingToEdit?._id === spending._id ? (
@@ -841,19 +841,19 @@ export default function CalendarPage() {
                         ) : (
                           // 일반 모드
                           <>
-                            <td className="px-6 py-4 text-black">
+                            <td className="px-3 py-4 text-black ">
                               {new Date(spending.date).toLocaleDateString()}
                             </td>
-                            <td className="px-6 py-4 text-black">
+                            <td className="px-2 py-4 text-black">
                               {getCategoryName(spending.category)}
                             </td>
-                            <td className="px-6 py-4 text-black">
+                            <td className="px-3 py-4 text-black ">
                               {spending.itemName}
                             </td>
-                            <td className="px-6 py-4 text-right text-black">
+                            <td className="px-2 py-4 text-center text-black">
                               {parseInt(spending.amount).toLocaleString()}원
                             </td>
-                            <td className="px-6 py-4 text-right">
+                            <td className="px-2 py-4 text-right">
                               <button
                                 onClick={() => handleEditSpending(spending)}
                                 className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors duration-200 mr-2"

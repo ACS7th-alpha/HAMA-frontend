@@ -181,24 +181,24 @@ export default function ProductDetail() {
 
             {/* 상품 정보 섹션 */}
 
-            <div className="pl-6 mt-2">
+            <div className="pl-6 mt-2 md:w-1/2">
               {/* 카테고리 뱃지 추가 */}
               <div className="flex items-center mt-12">
                 <span className="inline-block bg-orange-200 px-4 py-1 rounded-full text-base font-medium">
                   {categoryIcons[product.category] || '🎁'} {product.category}
                 </span>
               </div>
-              <div className=" rounded-2xl p-2 mb-6">
-                <h1 className="text-2xl font-bold text-gray-800 mt-6 mb-3">{product.name}</h1>
+              <div className=" rounded-2xl p-2 mb-6 mr-4">
+                <h1 className="text-2xl font-bold text-gray-800 mt-6 mb-3 mr-12">{product.name}</h1>
                 <p className="text-2xl font-bold text-black mb-4">{product.sale_price}</p>
-                <hr className="border-gray-200 my-4 mt-10" />
+                <hr className="border-gray-200 my-4 mt-10 mr-12" />
                 <div className="grid grid-cols-[100px_auto] gap-x-4 gap-y-2 text-black text-base">
                   <span className="font-medium">브랜드</span> <span>{product.brand}</span>              
                   <span className="font-medium">구매처</span> <span>{product.site}</span> 
                 </div>
-                <hr className="border-gray-200 my-4" />
+                <hr className="border-gray-200 my-4 mr-12" />
               </div>
-              <div className="flex gap-4 mt-8 items-center justify-start">
+              <div className="flex gap-4 mt-8 items-center justify-start mr-4">
                 <button
                   onClick={handleAddToCart}
                   className="flex-1 bg-orange-400 text-white py-3 px-4 hover:bg-orange-600 transition-colors duration-200"

@@ -55,9 +55,9 @@ export default function CommunityPage() {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      <div className="max-w-5xl mx-auto p-6 bg-white rounded-lg mt-6">
+      <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg mt-6">
         <h1 className="text-4xl font-bold mb-4">육아 아이템 공유 커뮤니티</h1>
-        <p className="text-xl font-medium mb-12">
+        <p className="text-xl font-medium mb-20">
           이곳에서 육아 아이템을 공유하고 정보를 나눠보세요!
         </p>
 
@@ -81,15 +81,15 @@ export default function CommunityPage() {
             />
             비추천템
           </label>
+                  {/* 글 작성 버튼 */}
+          <Link
+            href="/community/write"
+            className="flex items-center gap-2 px-4 py-2 bg-orange-400 text-white rounded-xl  ml-auto block mb-4"
+          >
+            글 작성
+          </Link>
         </div>
 
-        {/* 글 작성 버튼 */}
-        <Link
-          href="/community/write"
-          className="flex items-center gap-2 px-4 py-2 bg-orange-400 text-white rounded-xl float-right mb-4"
-        >
-          글 작성
-        </Link>
 
         {/* 아이템 목록 */}
         <div className="space-y-10">
