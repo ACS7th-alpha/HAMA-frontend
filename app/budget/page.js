@@ -435,14 +435,14 @@ export default function BudgetPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       <Header />
       <main className="max-w-7xl mx-auto px-8 flex flex-col">
         <div className="max-w-4xl mx-auto w-full relative">
           <div className="absolute top-8 right-0">
             <button
               onClick={handleSave}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md transition-colors duration-200 flex items-center gap-2"
+              className="bg-orange-400 hover:bg-orange-600 text-white px-4 py-2 rounded-lg shadow-md transition-colors duration-200 flex items-center gap-2"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

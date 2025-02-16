@@ -189,25 +189,24 @@ export default function Header({ onLogin }) {
   };
 
   return (
-    <header className="bg-white shadow-md p-4 flex flex-col items-center">
-      <div className="w-full flex justify-between items-center px-6">
-        <Link href="/">
+    <header className="bg-white flex flex-col items-center">
+      <div className="w-full flex justify-center items-center px-6 gap-x-24">
+        <Link href="/" className="mr-8">
           <Image src="/hama_logo.jpg" alt="HAMA Logo" width={150} height={50} />
         </Link>
-
         <div className="flex justify-center">
           <form onSubmit={handleSearch} className="flex-1 max-w-xl mx-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-0">
               <input
                 type="text"
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
                 placeholder="어떤 상품을 찾으시나요?"
-                className="flex-1 px-4 py-2 rounded-full border-2 border-pink-200 focus:border-pink-500 focus:outline-none"
+                className="flex-1 px-4 py-2 rounded-full border-2 border-orange-300 focus:border-orange-500 focus:outline-none"
               />
               <button
                 type="submit"
-                className="px-6 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition-colors duration-200 whitespace-nowrap"
+                className="px-6 py-2 bg-orange-400 text-white rounded-full hover:bg-orange-500 transition-colors duration-200 whitespace-nowrap"
               >
                 검색
               </button>
@@ -240,61 +239,70 @@ export default function Header({ onLogin }) {
             />
           )}
           {isLoggedIn && (
-            <nav className="flex items-center gap-1">
+            <nav className="flex items-center space-x-0">
               {/* 장바구니 버튼 */}
               <Link
                 href="/shoppingcart"
-                className="flex flex-col items-center gap-2 px-4 py-2 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
+                className="flex flex-col items-center  px-2 py-2 text-pink-600 rounded-lg hover:bg-blue-200 transition-colors"
               >
-                <span className="text-xl">🛒</span>
-                <span className="font-semibold">장바구니</span>
+                <span className="text-2xl">🛒</span>
+                <span className="text-sm font-semibold">장바구니</span>
               </Link>
 
               {/* 마이페이지 버튼 */}
               <Link
                 href="/mypage"
-                className="flex flex-col items-center gap-2 px-4 py-2 text-pink-600 rounded-lg hover:bg-pink-200 transition-colors"
+                className="flex flex-col items-center px-2 py-2 text-orange-600 rounded-lg hover:bg-orange-200 transition-colors"
               >
-                <span className="text-xl">👤</span>
-                <span className="font-semibold">마이페이지</span>
+                <span className="text-2xl">👤</span>
+                <span className="text-sm font-semibold">마이페이지</span>
               </Link>
 
               {/* 로그아웃 버튼 */}
               <button
                 onClick={handleLogout}
-                className="flex flex-col items-center gap-2 px-4 py-2 bg-pink-100 text-red-600 rounded-lg font-semibold hover:bg-pink-200 transition-colors"
+                className="flex flex-col items-center px-2 py-2 text-gray-600 rounded-lg font-semibold bg-white hover:bg-pink-200 transition-colors"
               >
-                <span className="text-xl">🚪</span>
-                <span>로그아웃</span>
+                <span className="text-2xl">🚪</span>
+                <span className="text-sm font-semibold">로그아웃</span>
               </button>
             </nav>
           )}
         </div>
       </div>
 
+
+
+
       {isLoggedIn && (
-        <nav className="w-full flex justify-center space-x-6 text-lg font-medium mt-4 border-b pb-2">
+        <nav className="w-full flex justify-center space-x-10 text-lg font-medium mt-10 border-b pb-2">
+          <Link
+            href="/"
+            className="hover:text-orange-600 hover:underline text-black transition-colors"
+          >
+            Home
+          </Link>
           <Link
             href="/budget"
-            className="hover:text-blue-600 hover:underline text-black transition-colors"
+            className="hover:text-orange-600 hover:underline text-black transition-colors"
           >
             예산관리
           </Link>
           <Link
             href="/statistics"
-            className="hover:text-blue-600 hover:underline text-black  transition-colors"
+            className="hover:text-orange-600 hover:underline text-black  transition-colors"
           >
             지출통계
           </Link>
           <Link
             href="/calendar"
-            className="hover:text-blue-600 hover:underline text-black transition-colors"
+            className="hover:text-orange-600 hover:underline text-black transition-colors"
           >
             지출달력
           </Link>
           <Link
             href="/community"
-            className="hover:text-blue-600 hover:underline text-black transition-colors"
+            className="hover:text-orange-600 hover:underline text-black transition-colors"
           >
             커뮤니티
           </Link>
