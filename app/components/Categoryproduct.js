@@ -104,6 +104,11 @@ export default function CategoryProduct() {
     }
   }, []);
 
+  // 상품 클릭 핸들러 추가
+  const handleProductClick = (uid) => {
+    router.push(`/product/${uid}`);
+  };
+
   return (
     <div className="min-h-screen bg-white mt-12">
       <div className="container max-w-6xl mx-auto px-4 py-12">
@@ -153,7 +158,8 @@ export default function CategoryProduct() {
               {products.map((product) => (
                 <div
                   key={product.uid}
-                  className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border-2 border-pink-100 hover:border-pink-200"
+                  onClick={() => handleProductClick(product.uid)}
+                  className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border-2 border-pink-100 hover:border-pink-200 cursor-pointer"
                 >
                   <div className="relative group">
                     <div className="aspect-square overflow-hidden">
@@ -183,20 +189,6 @@ export default function CategoryProduct() {
                           {product.sale_price}
                         </p>
                       </div>
-                      <button
-                        onClick={() => {
-                          sessionStorage.setItem('prevPage', page.toString());
-                          sessionStorage.setItem('prevCategory', category);
-                          sessionStorage.setItem(
-                            'scrollPosition',
-                            window.scrollY.toString()
-                          );
-                          router.push(`/product/${product.uid}`);
-                        }}
-                        className="flex items-center gap-1 bg-orange-100 hover:bg-pink-200 text-orange-600 px-4 py-2 rounded-full text-xs font-medium transition-colors duration-200"
-                      >
-                        자세히 보기 <span>→</span>
-                      </button>
                     </div>
                   </div>
                 </div>
