@@ -181,7 +181,7 @@ export default function ProductDetail() {
 
             {/* 상품 정보 섹션 */}
 
-            <div className="pl-6 mt-2 md:w-1/2">
+            <div className="mt-2 md:w-1/2">
               {/* 카테고리 뱃지 추가 */}
               <div className="flex items-center mt-12">
                 <span className="inline-block bg-orange-200 px-4 py-1 rounded-full text-base font-medium">
@@ -198,10 +198,10 @@ export default function ProductDetail() {
                 </div>
                 <hr className="border-gray-200 my-4 mr-12" />
               </div>
-              <div className="flex gap-4 mt-8 items-center justify-start mr-4">
+              <div className="flex gap-4 mt-8 mb-12 items-center ml-12">
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 bg-orange-400 text-white py-3 px-4 hover:bg-orange-600 transition-colors duration-200"
+                  className="w-36 h-12 bg-orange-400 text-white py-3 px-4 hover:bg-orange-600 transition-colors duration-200"
                 >
                   장바구니 담기
                 </button>
@@ -210,7 +210,7 @@ export default function ProductDetail() {
                   href={product.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 py-3 px-4 h-12 bg-white border-2 border-orange-500 text-orange-600 hover:text-black transition-colors duration-200 text-center flex items-center justify-center"
+                  className="w-36 py-3 px-4 h-12 bg-white border-2 border-orange-500 text-orange-600 hover:text-black transition-colors duration-200 text-center flex items-center justify-center"
                 >
                   구매하러 가기
                 </a>
@@ -315,7 +315,7 @@ export default function ProductDetail() {
             </div>
             {/* 장점 */}
             {product.additionalInfo.review_summary.advantages?.length > 0 && (
-              <div className="mb-8">
+              <div className="mb-8 px-12">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2 bg-green-50 p-4 rounded-xl">
                   <span className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white">
                     <span className="text-xl">👍</span>
@@ -341,7 +341,7 @@ export default function ProductDetail() {
             {/* 단점 */}
             {product.additionalInfo.review_summary.disadvantages?.length >
               0 && (
-              <div>
+              <div className="mb-8 px-12">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2 bg-red-50 p-4 rounded-xl">
                   <span className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white">
                     <span className="text-xl">👎</span>
