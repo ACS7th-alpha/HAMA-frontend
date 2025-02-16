@@ -634,11 +634,11 @@ export default function CalendarPage() {
     return <div>Loading...</div>;
   }
 
-  return (
-    <div className="min-h-screen bg-gray-100">
+  return (  
+    <div className="min-h-screen bg-white">
       <Header />
-      <main className="container mx-auto p-4">
-        <div className="bg-white rounded-lg shadow p-6">
+      <main className="container mx-auto max-w-6xl">
+        <div className="bg-white rounded-lg shadow p-12">
           {/* 달력 헤더 */}
           <div className="flex justify-center items-center mb-6">
             <button
@@ -706,12 +706,12 @@ export default function CalendarPage() {
           {/* 달력 이후 추가되는 섹션 */}
           <div className="mt-8 space-y-8">
             {/* 지출 내역 */}
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white rounded-lg shadow p-12">
               <h3 className="text-xl font-bold mb-4 text-black">지출 내역</h3>
               <div className="overflow-x-auto mb-6">
                 <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
+                  <thead className="bg-orange-50">
+                    <tr className="border-b">
                       <th className="px-6 py-3 text-left text-black font-semibold">
                         날짜
                       </th>
@@ -721,11 +721,11 @@ export default function CalendarPage() {
                       <th className="px-6 py-3 text-left text-black font-semibold">
                         상품
                       </th>
-                      <th className="px-6 py-3 text-right text-black font-semibold">
+                      <th className="px-6 py-3 text-center text-black font-semibold">
                         지출
                       </th>
-                      <th className="px-6 py-3 text-right text-black font-semibold">
-                        작업
+                      <th className="px-6 py-3 text-center text-black font-semibold">
+                        편집
                       </th>
                     </tr>
                   </thead>
@@ -907,7 +907,7 @@ export default function CalendarPage() {
             </div>
 
             {/* 지출 등록 */}
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white rounded-lg shadow p-12">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold mb-4 text-black">지출 등록</h2>
                 <div className="flex items-center space-x-4">
@@ -926,8 +926,8 @@ export default function CalendarPage() {
                       className={`flex items-center cursor-pointer ${
                         isAnalyzing
                           ? 'bg-gray-400'
-                          : 'bg-purple-500 hover:bg-purple-600'
-                      } text-white py-2 px-4 rounded-md transition duration-200`}
+                          : 'bg-orange-100 hover:bg-orange-200'
+                      } text-orange-600 py-2 px-4 rounded-md transition duration-200`}
                     >
                       {isAnalyzing ? (
                         <>
@@ -984,7 +984,7 @@ export default function CalendarPage() {
                   <button
                     type="button"
                     onClick={addSpendingItem}
-                    className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md transition duration-200 flex items-center"
+                    className="bg-orange-400 hover:bg-orange-600 text-white py-2 px-4 rounded-md transition duration-200 flex items-center"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -1139,7 +1139,7 @@ export default function CalendarPage() {
                   ) : (
                     <button
                       onClick={handleSubmit}
-                      className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors duration-200"
+                      className="inline-flex items-center px-4 py-2 bg-pink-100 text-pink-600 rounded-md hover:bg-blue-200 transition-colors duration-200"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
