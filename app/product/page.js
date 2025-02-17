@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -9,7 +9,7 @@ export default function ProductList() {
   const [category, setCategory] = useState('전체');
   const [userInfo, setUserInfo] = useState(null);
   const router = useRouter();
-  const limit = 8;  // 화면에 표시할 개수
+  const limit = 8; // 화면에 표시할 개수
 
   // Fisher-Yates 알고리즘으로 배열을 랜덤하게 섞기
   function shuffleArray(array) {
@@ -38,7 +38,7 @@ export default function ProductList() {
       try {
         let url;
         if (category === '전체') {
-          url = `http://localhost:3007/products?random=${Math.random()}`;  // 모든 상품 가져오기
+          url = `http://localhost:3007/products?random=${Math.random()}`; // 모든 상품 가져오기
         } else {
           url = `http://localhost:3007/products/category/${category}?random=${Math.random()}`;
         }
@@ -57,7 +57,7 @@ export default function ProductList() {
           setProducts([]);
         }
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error('Error fetching products:', error);
         setProducts([]);
       } finally {
         setLoading(false);
@@ -89,15 +89,15 @@ export default function ProductList() {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 md-grid-cols-3 lg:grid-cols-4 gap-6">
               {products.map((product) => (
-                <div 
-                  key={product.uid} 
+                <div
+                  key={product.uid}
                   className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border-2 border-pink-100 hover:border-pink-200"
                 >
                   <div className="relative group">
                     <div className="aspect-square overflow-hidden">
-                      <img 
-                        src={product.img} 
-                        alt={product.name} 
+                      <img
+                        src={product.img}
+                        alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
@@ -114,7 +114,9 @@ export default function ProductList() {
                     </h2>
                     <div className="flex justify-between items-end">
                       <div>
-                        <p className="text-sm text-gray-500 mb-1">{product.site}</p>
+                        <p className="text-sm text-gray-500 mb-1">
+                          {product.site}
+                        </p>
                         <p className="text-xl font-bold text-black">
                           {product.sale_price}
                         </p>
@@ -133,7 +135,9 @@ export default function ProductList() {
 
             {products.length === 0 && (
               <div className="text-center py-20">
-                <p className="text-gray-500">해당 카테고리의 상품이 없습니다 🎈</p>
+                <p className="text-gray-500">
+                  해당 카테고리의 상품이 없습니다 🎈
+                </p>
               </div>
             )}
           </>
