@@ -34,7 +34,7 @@ export default function ProductDetail() {
       }
 
       // POST 요청으로 상품을 장바구니에 추가
-      const response = await fetch(`http://localhost:3008/cart/add`, {
+      const response = await fetch(`${process.env.BACKEND_CART_URL}/cart/add`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -74,7 +74,7 @@ export default function ProductDetail() {
       setLoading(true);
       try {
         const response = await fetch(
-          `http://localhost:3007/products/${params.uid}`
+          `${process.env.BACKEND_SEARCH_URL}/products/${params.uid}`
         );
         if (!response.ok) throw new Error('상품을 불러올 수 없습니다.');
 
@@ -372,9 +372,12 @@ export default function ProductDetail() {
           </div>
         ) : (
           <div className="mt-12 bg-white rounded-3xl shadow-lg p-8 mt-12 text-center">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2 mt-12">해당 상품은 현재 분석 가능한 리뷰가 없습니다.</h2>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">곧 더 많은 정보를 제공할 예정입니다!</h2>
-            
+            <h2 className="text-2xl font-bold text-gray-800 mb-2 mt-12">
+              해당 상품은 현재 분석 가능한 리뷰가 없습니다.
+            </h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+              곧 더 많은 정보를 제공할 예정입니다!
+            </h2>
           </div>
         )}
       </div>

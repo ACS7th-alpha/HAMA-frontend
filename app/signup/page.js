@@ -89,13 +89,16 @@ export default function SignupPage() {
 
     try {
       console.log('회원가입 요청 시작...');
-      const response = await fetch('http://localhost:3001/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(signupData),
-      });
+      const response = await fetch(
+        `${process.env.BACKEND_AUTH_URL}/auth/register`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(signupData),
+        }
+      );
 
       const data = await response.json();
       console.log('서버 응답:', data);
@@ -122,28 +125,31 @@ export default function SignupPage() {
           const year = currentDate.getFullYear(); // 현재 년도
           const month = currentDate.getMonth() + 1; // 현재 월 (0부터 시작하므로 +1)
 
-          const budgetResponse = await fetch('http://localhost:3005/budget', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${data.access_token}`,
-            },
-            body: JSON.stringify({
-              year: year, // 현재 년도
-              month: month, // 현재 월
-              categories: {
-                diaper: 0,
-                sanitary: 0,
-                feeding: 0,
-                skincare: 0,
-                food: 0,
-                toys: 0,
-                bedding: 0,
-                fashion: 0,
-                other: 0,
+          const budgetResponse = await fetch(
+            `${process.env.BACKEND_BUDGET_URL}/budget`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${data.access_token}`,
               },
-            }),
-          });
+              body: JSON.stringify({
+                year: year,
+                month: month,
+                categories: {
+                  diaper: 0,
+                  sanitary: 0,
+                  feeding: 0,
+                  skincare: 0,
+                  food: 0,
+                  toys: 0,
+                  bedding: 0,
+                  fashion: 0,
+                  other: 0,
+                },
+              }),
+            }
+          );
 
           if (!budgetResponse.ok) {
             console.warn('초기 예산 설정 실패:', await budgetResponse.text());

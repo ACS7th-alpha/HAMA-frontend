@@ -15,12 +15,15 @@ export default function CommunityPage() {
     const fetchItems = async () => {
       try {
         const accessToken = localStorage.getItem('access_token'); // 액세스 토큰 가져오기
-        const response = await fetch('http://localhost:3004/reviews', {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${accessToken}`, // 액세스 토큰 사용
-          },
-        });
+        const response = await fetch(
+          `${process.env.BACKEND_REVIEW_URL}/reviews`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${accessToken}`, // 액세스 토큰 사용
+            },
+          }
+        );
 
         if (!response.ok) {
           throw new Error('데이터를 불러오는데 실패했습니다.');
@@ -81,7 +84,7 @@ export default function CommunityPage() {
             />
             비추천템
           </label>
-                  {/* 글 작성 버튼 */}
+          {/* 글 작성 버튼 */}
           <Link
             href="/community/write"
             className="flex items-center gap-2 px-4 py-2 bg-orange-400 text-white rounded-xl ml-auto block"
@@ -89,7 +92,6 @@ export default function CommunityPage() {
             글 작성
           </Link>
         </div>
-
 
         {/* 아이템 목록 */}
         <div className="space-y-10">

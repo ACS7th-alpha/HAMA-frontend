@@ -25,10 +25,10 @@ export default function ShoppingCart() {
         return;
       }
 
-      const response = await fetch('http://localhost:3008/cart', {
+      const response = await fetch(`${process.env.BACKEND_CART_URL}/cart`, {
         headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
 
       if (!response.ok) {
@@ -48,12 +48,15 @@ export default function ShoppingCart() {
   const handleRemoveItem = async (uid) => {
     try {
       const accessToken = localStorage.getItem('access_token');
-      const response = await fetch(`http://localhost:3008/cart/remove/${uid}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        },
-      });
+      const response = await fetch(
+        `${process.env.BACKEND_CART_URL}/cart/remove/${uid}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
       if (!response.ok) throw new Error('상품 삭제 실패');
 
@@ -70,12 +73,15 @@ export default function ShoppingCart() {
 
     try {
       const accessToken = localStorage.getItem('access_token');
-      const response = await fetch('http://localhost:3008/cart/clear', {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        },
-      });
+      const response = await fetch(
+        `${process.env.BACKEND_CART_URL}/cart/clear`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
       if (!response.ok) throw new Error('장바구니 전체 삭제 실패');
 
@@ -89,8 +95,8 @@ export default function ShoppingCart() {
 
   // 🔹 총 가격 계산 (숫자 이외의 문자 제거 후 숫자로 변환)
   const totalPrice = cartItems.reduce(
-      (sum, item) => sum + Number(item.sale_price.replace(/\D/g, '')),
-      0
+    (sum, item) => sum + Number(item.sale_price.replace(/\D/g, '')),
+    0
   );
 
   if (loading) {
@@ -105,7 +111,7 @@ export default function ShoppingCart() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <p className="text-red-500 mb-4">{error}</p>
-        <Link 
+        <Link
           href="/"
           className="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
         >
@@ -118,7 +124,7 @@ export default function ShoppingCart() {
   if (cartItems.length === 0) {
     return (
       <div className="min-h-screen bg-white">
-      <Header />
+        <Header />
         <div className="max-w-4xl mx-auto px-4 py-8">
           <h1 className="text-2xl font-bold text-gray-800 mb-8">장바구니</h1>
           <div className="bg-white rounded-lg  p-8 text-center">
@@ -176,16 +182,23 @@ export default function ShoppingCart() {
 
         <div className="space-y-4">
           {cartItems.map((item) => (
-            <div key={item.uid} className="bg-white rounded-2xl shadow-md p-5 flex items-center gap-6">
+            <div
+              key={item.uid}
+              className="bg-white rounded-2xl shadow-md p-5 flex items-center gap-6"
+            >
               <img
                 src={item.img}
                 alt={item.name}
                 className="w-32 h-32 object-cover rounded-xl mr-3"
               />
               <div className="flex-1">
-                <h2 className="text-lg font-semibold text-gray-800 mb-1">{item.name}</h2>
+                <h2 className="text-lg font-semibold text-gray-800 mb-1">
+                  {item.name}
+                </h2>
                 <p className="text-sm text-gray-500 mb-1">{item.brand}</p>
-                <p className="text-xl font-bold text-black">{item.sale_price.toLocaleString()}</p>
+                <p className="text-xl font-bold text-black">
+                  {item.sale_price.toLocaleString()}
+                </p>
               </div>
               <button
                 onClick={() => handleRemoveItem(item.uid)}
@@ -205,7 +218,10 @@ export default function ShoppingCart() {
 
         <div className="mt-12 border-t border-gray-300 pt-6 text-center">
           <p className="text-2xl font-semibold text-gray-800">
-            총 {cartItems.length}개 상품 금액: <span className="text-orange-500">{totalPrice.toLocaleString()}</span>
+            총 {cartItems.length}개 상품 금액:{' '}
+            <span className="text-orange-500">
+              {totalPrice.toLocaleString()}
+            </span>
           </p>
         </div>
       </div>

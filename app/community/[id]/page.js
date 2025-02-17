@@ -16,8 +16,11 @@ export default function ProductDetail({ params }) {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`http://localhost:3004/reviews/${id}`);
-        if (!response.ok) throw new Error('상품 정보를 불러오는데 실패했습니다.');
+        const response = await fetch(
+          `${process.env.BACKEND_REVIEW_URL}/reviews/${id}`
+        );
+        if (!response.ok)
+          throw new Error('상품 정보를 불러오는데 실패했습니다.');
         const data = await response.json();
         setProduct(data);
       } catch (error) {
@@ -32,13 +35,15 @@ export default function ProductDetail({ params }) {
   useEffect(() => {
     const fetchOtherProducts = async () => {
       try {
-        const response = await fetch('http://localhost:3004/reviews');
+        const response = await fetch(
+          `${process.env.BACKEND_REVIEW_URL}/reviews`
+        );
         if (!response.ok) throw new Error('데이터를 불러오는데 실패했습니다.');
-        
+
         const data = await response.json();
         // 현재 글을 제외하고 최신순으로 정렬
         const filteredAndSorted = data
-          .filter(item => item._id !== id)
+          .filter((item) => item._id !== id)
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
           .slice(0, 3); // 최대 3개만 표시
 
@@ -80,10 +85,7 @@ export default function ProductDetail({ params }) {
 
         {/* 이미지 슬라이더 */}
         <div className="mb-8">
-          <ImageSlider 
-            images={product.imageUrls} 
-            productName={product.name}
-          />
+          <ImageSlider images={product.imageUrls} productName={product.name} />
         </div>
 
         {/* 상품 정보 */}
@@ -96,7 +98,7 @@ export default function ProductDetail({ params }) {
           <div>
             <h2 className="text-lg font-semibold mb-2">구매처</h2>
             {product.purchaseLink ? (
-              <a 
+              <a
                 href={product.purchaseLink}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -111,7 +113,9 @@ export default function ProductDetail({ params }) {
 
           <div>
             <h2 className="text-lg font-semibold mb-2">상세 설명</h2>
-            <p className="text-gray-700 whitespace-pre-wrap">{product.description}</p>
+            <p className="text-gray-700 whitespace-pre-wrap">
+              {product.description}
+            </p>
           </div>
         </div>
 
@@ -119,14 +123,14 @@ export default function ProductDetail({ params }) {
         <div className="mt-16 border-t pt-12">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-bold">다른 글 더 보러가기</h2>
-            <Link 
-              href="/community" 
+            <Link
+              href="/community"
               className="text-blue-600 hover:text-blue-800 font-medium"
             >
               전체보기
             </Link>
           </div>
-          
+
           <div className="space-y-8">
             {otherProducts.map((item) => (
               <ItemCard key={item._id} item={item} />

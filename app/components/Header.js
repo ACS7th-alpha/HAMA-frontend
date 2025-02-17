@@ -49,15 +49,18 @@ export default function Header({ onLogin }) {
       );
       console.log('갱신 요청 시작...');
 
-      const response = await fetch('http://localhost:3001/auth/refresh', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          refreshToken: refreshToken,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.BACKEND_AUTH_URL}/auth/refresh`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            refreshToken: refreshToken,
+          }),
+        }
+      );
 
       console.log('서버 응답 상태:', response.status);
 

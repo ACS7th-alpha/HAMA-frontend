@@ -109,14 +109,17 @@ export default function ChatButton() {
     };
 
     try {
-      const response = await fetch('http://localhost:3009/perplexity/ask', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-        body: JSON.stringify(questionData),
-      });
+      const response = await fetch(
+        `${process.env.BACKEND_CHAT_URL}/perplexity/ask`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+          },
+          body: JSON.stringify(questionData),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -226,11 +229,14 @@ export default function ChatButton() {
     };
 
     try {
-      const response = await fetch('http://localhost:3009/perplexity/ask', {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(questionData),
-      });
+      const response = await fetch(
+        `${process.env.BACKEND_CHAT_URL}/perplexity/ask`,
+        {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(questionData),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Network response was not ok');

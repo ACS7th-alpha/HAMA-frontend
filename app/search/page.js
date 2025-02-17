@@ -19,11 +19,15 @@ export default function SearchResults() {
       setLoading(true);
       try {
         const response = await fetch(
-          `http://localhost:3007/search?keyword=${encodeURIComponent(keyword)}&page=${page}&limit=${limit}`
+          `${
+            process.env.BACKEND_SEARCH_URL
+          }/search?keyword=${encodeURIComponent(
+            keyword
+          )}&page=${page}&limit=${limit}`
         );
         const data = await response.json();
         setProducts(Array.isArray(data.data) ? data.data : []);
-        setTotalPages(Math.ceil(data.total / limit));  // Calculate total pages
+        setTotalPages(Math.ceil(data.total / limit)); // Calculate total pages
         setTotalCount(data.total || 0); // 총 건수 설정
       } catch (error) {
         console.error('Error fetching search results:', error);
@@ -55,7 +59,6 @@ export default function SearchResults() {
 
   const { startPage, endPage } = getPageRange();
 
-
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -63,10 +66,14 @@ export default function SearchResults() {
         {/* 검색 결과 헤더 */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
-          &ldquo;{keyword}&rdquo; 검색 결과
+            &ldquo;{keyword}&rdquo; 검색 결과
           </h1>
           <p className="text-xl text-gray-600">
-            총 <span className="text-xl font-bold text-orange-500">{totalCount}</span>건의 상품이 있습니다
+            총{' '}
+            <span className="text-xl font-bold text-orange-500">
+              {totalCount}
+            </span>
+            건의 상품이 있습니다
           </p>
         </div>
 
@@ -93,7 +100,9 @@ export default function SearchResults() {
                       {product.name}
                     </h2>
                     <div>
-                      <p className="text-sm text-gray-500 mb-1">{product.site}</p>
+                      <p className="text-sm text-gray-500 mb-1">
+                        {product.site}
+                      </p>
                       <p className="text-xl font-bold text-black">
                         {product.sale_price}
                       </p>
@@ -115,11 +124,16 @@ export default function SearchResults() {
 
                 {/* 페이지 번호 목록 */}
                 <div className="flex gap-1">
-                  {Array.from({ length: endPage - startPage + 1 }, (_, idx) => startPage + idx).map((n) => (
+                  {Array.from(
+                    { length: endPage - startPage + 1 },
+                    (_, idx) => startPage + idx
+                  ).map((n) => (
                     <button
                       key={n}
                       onClick={() => setPage(n)}
-                      className={`rounded-full text-pink-600 font-medium ${page === n ? 'bg-pink-100' : 'bg-white hover:bg-pink-50'}`}
+                      className={`rounded-full text-pink-600 font-medium ${
+                        page === n ? 'bg-pink-100' : 'bg-white hover:bg-pink-50'
+                      }`}
                     >
                       {n}
                     </button>

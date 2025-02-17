@@ -68,11 +68,14 @@ export default function StatisticsPage() {
           return;
         }
 
-        const response = await fetch('http://localhost:3005/budget/spending', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
+        const response = await fetch(
+          `${process.env.BACKEND_BUDGET_URL}/budget/spending`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
 
         if (response.status === 404) {
           console.log('No spending data found');

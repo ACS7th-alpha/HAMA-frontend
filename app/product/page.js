@@ -38,9 +38,13 @@ export default function ProductList() {
       try {
         let url;
         if (category === '전체') {
-          url = `http://localhost:3007/products?random=${Math.random()}`; // 모든 상품 가져오기
+          url = `${
+            process.env.BACKEND_SEARCH_URL
+          }/products?random=${Math.random()}`; // 모든 상품 가져오기
         } else {
-          url = `http://localhost:3007/products/category/${category}?random=${Math.random()}`;
+          url = `${
+            process.env.BACKEND_SEARCH_URL
+          }/products/category/${category}?random=${Math.random()}`;
         }
 
         const response = await fetch(url, {

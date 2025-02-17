@@ -21,7 +21,7 @@ export default function CategoryProduct() {
     { id: '스킨케어_화장품', name: '스킨케어/화장품', icon: '🧴' },
     { id: '생활_위생용품', name: '생활/위생용품', icon: '🧼' },
     { id: '침구류', name: '침구류', icon: '🌛' },
-    { id: '식품', name: '식품', icon: '🧀'},
+    { id: '식품', name: '식품', icon: '🧀' },
     { id: '완구용품', name: '완구용품', icon: '✏️' },
     { id: '패션의류_잡화', name: '패션의류/잡화', icon: '👕' },
   ];
@@ -48,9 +48,9 @@ export default function CategoryProduct() {
       try {
         let url;
         if (category === '전체') {
-          url = `http://localhost:3007/products?page=${page}&limit=${limit}`;
+          url = `${process.env.BACKEND_SEARCH_URL}/products?page=${page}&limit=${limit}`;
         } else {
-          url = `http://localhost:3007/products/category/${category}?page=${page}&limit=${limit}`;
+          url = `${process.env.BACKEND_SEARCH_URL}/products/category/${category}?page=${page}&limit=${limit}`;
         }
 
         const response = await fetch(url);
