@@ -34,7 +34,7 @@ export default function ProductDetail() {
       }
 
       // POST 요청으로 상품을 장바구니에 추가
-      const response = await fetch(`${process.env.BACKEND_CART_URL}/cart/add`, {
+      const response = await fetch(`http://localhost:3008/cart/add`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -74,7 +74,7 @@ export default function ProductDetail() {
       setLoading(true);
       try {
         const response = await fetch(
-          `${process.env.BACKEND_SEARCH_URL}/products/${params.uid}`
+          `http://localhost:3007/products/${params.uid}`
         );
         if (!response.ok) throw new Error('상품을 불러올 수 없습니다.');
 
@@ -98,7 +98,7 @@ export default function ProductDetail() {
   }, [userInfo]);
 
   // 리뷰 데이터 존재 여부 확인
-  const hasReviewData = product?.additionalInfo?.review_summary;
+  const hasReviewData = product?.additionalInfo;
 
   if (loading) {
     return (
@@ -227,7 +227,7 @@ export default function ProductDetail() {
         </div>
 
         {/* 리뷰 섹션 - 조건부 렌더링 */}
-        {hasReviewData > 0 ? (
+        {hasReviewData ? (
           <div className="mt-12 bg-white rounded-3xl shadow-lg p-8 relative">
             {/* 로그인하지 않은 경우 블러 처리 및 알림 */}
             {!isLoggedIn && (
@@ -372,12 +372,8 @@ export default function ProductDetail() {
           </div>
         ) : (
           <div className="mt-12 bg-white rounded-3xl shadow-lg p-8 mt-12 text-center">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2 mt-12">
-              해당 상품은 현재 분석 가능한 리뷰가 없습니다.
-            </h2>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              곧 더 많은 정보를 제공할 예정입니다!
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2 mt-12">해당 상품은 현재 분석 가능한 리뷰가 없습니다.</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">곧 더 많은 정보를 제공할 예정입니다!</h2>
           </div>
         )}
       </div>
