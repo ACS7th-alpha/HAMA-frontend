@@ -19,7 +19,7 @@ export default function SearchResults() {
       setLoading(true);
       try {
         const response = await fetch(
-          `http://localhost:3007/products/search?keyword=${encodeURIComponent(keyword)}&page=${page}&limit=${limit}`
+          `http://localhost:3007/search?keyword=${encodeURIComponent(keyword)}&page=${page}&limit=${limit}`
         );
         const data = await response.json();
         setProducts(Array.isArray(data.data) ? data.data : []);
