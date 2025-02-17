@@ -1,3 +1,4 @@
+'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'; // 라우터 추가
 import CartBasedRecommendation from './CartBasedRecommendation';
@@ -11,10 +12,63 @@ export default function UserDashboard({
   const router = useRouter(); // 라우터 초기화화
   const [products, setProducts] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showAgeInfo, setShowAgeInfo] = useState(false);
   
   useEffect(() => {
     fetchAgeBasedProducts();
   }, [childAge]);
+
+
+
+  const getAgeCharacteristics = (age) => {
+    if (age <= 1) {
+      return (
+        <>
+          신생아는 세상에 적응하는 시기로, 수면과 수유가 가장 중요한 활동입니다. <br />
+          이 시기의 아기는 부모의 목소리와 심장 소리에 익숙해지며, 피부 접촉을 통해 안정감을 느낍니다. <br />
+          부모님은 아기의 움직임을 지켜보며 충분한 자극(감각 놀이, 소리 내기 등)을 제공하고, 안전한 공간에서  <br /> 자유롭게 탐색할 수 있도록 도와야 합니다.
+        </>
+      );
+    } else if (age < 12) {
+      return (
+        <>
+          이 시기의 아기들은 급속도로 성장하며, 목 가누기 → 뒤집기 → 앉기 → 기기 → 서기 → 걷기의 과정을 거치면서 <br /> 신체 능력이 발달합니다.
+          영유아는 부모님은 아기의 움직임을 지켜보며 충분한 자극(감각 놀이, 소리 내기 등)을 <br /> 제공하고,
+          안전한 공간에서 자유롭게 탐색할 수 있도록 도와야 합니다.
+        </>
+      );
+    } else if (age < 36) {
+      return (
+        <>
+          이 시기의 아이들은 자율성을 키워가는 시기로, 스스로 걷고, 뛰며 신체 활동이 활발해지고 말을 배우고 <br /> 기본적인 의사소통을 할 수 있게 됩니다.
+          부모님은 아이가 스스로 할 수 있는 기회를 주고, 긍정적인 피드백을 통해 <br /> 자율성과 자신감을 키워주는 것이 중요합니다. 또한 감정을 조절하는 방법을 자연스럽게 배우도록 돕는 것이 필요합니다.
+        </>
+      );
+    } else {
+      return (
+        <>
+          이 시기의 아이들은 창의력과 자율성을 키워가는 시기입니다. 
+          놀이를 통해 상상력을 발휘하고, 스스로 결정하며 <br /> 책임감을 배웁니다.
+          또한 사회성이 발달하며, 또래 친구들과 상호작용하는 능력이 향상됩니다. 
+          부모님은 아이가 <br /> 주도적으로 탐구하고 배울 수 있는 환경을 제공하는 것이 중요하며, 창의적 사고를 자극하는 놀이와 활동을 충분히 <br />경험할 수 있도록 지원해야 합니다.
+        </>
+      );
+    }
+  };
+  
+
+  // 연령대별 제목 가져오는 함수
+  const getAgeGroupTitle = (age) => {
+    if (age <= 1) {
+      return "👶 신생아 | 출생 후 ~ 1개월 (0~4주)";
+    } else if (age < 12) {
+      return "👶 영아 | 1개월 ~ 12개월 (1세 미만)";
+    } else if (age < 36) {
+      return "👶 유아 | 12개월 ~ 36개월 (1세 ~ 3세)";
+    } else {
+      return "🧒 어린이 | 36개월 이상 (3세 이상)";
+    }
+  };  
 
   const fetchAgeBasedProducts = async () => {
     try {
@@ -98,7 +152,7 @@ export default function UserDashboard({
             {/* 사용자 프로필 섹션 */}
             <div className="flex flex-col items-center">
               {userInfo.photo && (
-                <div className="w-20 h-20 rounded-full overflow-hidden mb-4 border-4 border-pink-200 shadow-lg">
+                <div className="w-20 h-20 rounded-full overflow-hidden mb-2 border-4 border-pink-200 shadow-lg">
                   <img
                     src={userInfo.photo}
                     alt="Profile"
@@ -108,12 +162,28 @@ export default function UserDashboard({
                 </div>
               )}
               <h2 className="text-xl font-bold text-gray-800">
-                {userInfo.nickname} <span className="ml-1"> </span>
+                {userInfo.nickname}
               </h2>
               {childAge !== null && (
-                <p className="text-lg mt-2 text-gray-600 bg-pink-100 px-4 py-1 rounded-full">
-                  {childAge}개월
-                </p>
+                <button
+                  onClick={() => setShowAgeInfo(!showAgeInfo)}
+                  className="mt-3 px-3 py-2 bg-pink-100 text-black rounded-full font-semibold text-base hover:bg-yellow-200 transition-colors duration-200 flex items-center gap-1"
+                >
+                  <span>{childAge}개월</span>
+                  <svg 
+                    className={`h-4 w-4 transition-transform duration-200 ${showAgeInfo ? 'rotate-180' : ''}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
               )}
             </div>
 
@@ -189,6 +259,39 @@ export default function UserDashboard({
         </div>
       </div>
 
+      {/* 연령별 특징 섹션 - 조건부 렌더링 */}
+      {showAgeInfo && (
+        <div className="max-w-4xl mx-auto px-4 mb-8 transition-all duration-300 ease-in-out">
+          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-400">
+            <div className="flex items-start space-x-4 mr-8">
+              <div className="flex-shrink-0">
+                <svg 
+                  className="h-6 w-6 text-yellow-400" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
+                  />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                  {getAgeGroupTitle(childAge)}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {getAgeCharacteristics(childAge)}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 준비리스트 섹션 추가 */}
       <div className="max-w-4xl mx-auto px-4 py-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">
@@ -236,7 +339,7 @@ export default function UserDashboard({
                 <h3 className="text-md font-semibold text-gray-800 mb-2 line-clamp-2">
                   {product.name}
                 </h3>
-                <p className="text-lg font-bold text-pink-500">
+                <p className="text-lg font-bold text-black-500">
                   {product.sale_price}
                 </p>
               </div>

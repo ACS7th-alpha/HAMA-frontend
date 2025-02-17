@@ -20,10 +20,10 @@ export default function CategoryProduct() {
     { id: '기저귀_물티슈', name: '기저귀/물티슈', icon: '👶' },
     { id: '스킨케어_화장품', name: '스킨케어/화장품', icon: '🧴' },
     { id: '생활_위생용품', name: '생활/위생용품', icon: '🧼' },
-    { id: '침구류', name: '침구류', icon: '🛏️' },
-    { id: '식품', name: '식품', icon: '🌟' },
-    { id: '완구용품', name: '완구용품', icon: '' },
-    { id: '패션의류_잡화', name: '패션의류/잡화', icon: '' },
+    { id: '침구류', name: '침구류', icon: '🌛' },
+    { id: '식품', name: '식품', icon: '🧀'},
+    { id: '완구용품', name: '완구용품', icon: '✏️' },
+    { id: '패션의류_잡화', name: '패션의류/잡화', icon: '👕' },
   ];
 
   useEffect(() => {
@@ -137,7 +137,7 @@ export default function CategoryProduct() {
                     }
                 `}
                 >
-                  <span className="text-2xl">{cat.icon}</span>
+                  <span className="text-4xl">{cat.icon}</span>
                 </button>
                 <span className="text-l font-medium text-gray-700">
                   {cat.name}

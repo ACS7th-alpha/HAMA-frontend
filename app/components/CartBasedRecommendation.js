@@ -50,7 +50,7 @@ export default function CartBasedRecommendation() {
   }, []);
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="max-w-4xl mx-auto px-4 py-8 mt-16">
       <h2 className="text-2xl font-semibold text-gray-800 mb-6">
       고객님의 장바구니에 담긴 상품을 기반으로 추천드려요
       </h2>

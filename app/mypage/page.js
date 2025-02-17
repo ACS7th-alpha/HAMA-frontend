@@ -467,17 +467,17 @@ export default function MyPage() {
         </div>
 
         {/* 탭 컨텐츠 */}
-        <div className="bg-white rounded-3xl shadow-lg p-12">
+        <div className="mb-36 rounded-3xl shadow-lg p-12">
           {activeTab === 'profile' && (
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">
+            <div className="space-y-6 px-8 mt-4">
+              <h2 className="text-2xl font-bold text-gray-800 mb-12">
                 프로필 정보 <span className="ml-2">📝</span>
               </h2>
               <div className="grid grid-cols-2 gap-8">
                 <div>
                   <p className="text-gray-600 mb-2">이메일</p>
                   <p className="text-lg font-semibold">{userInfo.email}</p>
-                  <div className="mt-4">
+                  <div className="mt-8">
                     <p className="text-gray-600 mb-2">당월 예산</p>
                     {isEditing ? (
                       <input
@@ -515,7 +515,7 @@ export default function MyPage() {
                   <>
                     <button
                       onClick={handleSaveProfile}
-                      className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors h-10"
+                      className="px-4 py-2 bg-orange-400 text-white rounded-md hover:bg-orange-600 transition-colors h-10"
                     >
                       저장
                     </button>
@@ -549,7 +549,7 @@ export default function MyPage() {
                 </button>
               </h2>
               {isAddingChild && ( // 추가 모드일 때 입력 필드 표시
-                <div className="rounded-2xl p-6 border-2 border-blue-100 flex justify-between items-center mb-4">
+                <div className="rounded-2xl p-6 border-2 border-gray-200 flex justify-between items-center mb-4">
                   <div className="grid grid-cols-3 gap-6">
                     <div>
                       <p className="text-gray-600 mb-2">이름</p>
@@ -559,7 +559,7 @@ export default function MyPage() {
                         onChange={(e) =>
                           setNewChild({ ...newChild, name: e.target.value })
                         }
-                        className="text-lg font-semibold border border-gray-300 rounded-md p-2"
+                        className="text-lg font-semibold border border-gray-300 rounded-md p-2 w-36 h-12"
                         required
                       />
                     </div>
@@ -585,7 +585,7 @@ export default function MyPage() {
                         onChange={(e) =>
                           setNewChild({ ...newChild, gender: e.target.value })
                         }
-                        className="text-lg font-semibold border border-gray-300 rounded-md p-2"
+                        className="text-lg font-semibold border border-gray-300 rounded-md p-2 h-12"
                         required
                       >
                         <option value="male">남자</option>
@@ -593,16 +593,16 @@ export default function MyPage() {
                       </select>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1">
                     <button
                       onClick={handleSaveNewChild}
-                      className="px-4 py-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors"
+                      className="px-4 py-2 bg-orange-200 text-gray-600 rounded-md hover:bg-green-200 transition-colors flex items-center justify-center whitespace-nowrap"
                     >
                       저장
                     </button>
                     <button
                       onClick={handleCancelAddChild}
-                      className="px-4 py-2 bg-gray-300 text-gray-600 rounded-md hover:bg-gray-400 transition-colors"
+                      className="px-4 py-2 bg-gray-300 text-gray-600 rounded-md hover:bg-gray-400 transition-colors flex items-center justify-center whitespace-nowrap" 
                     >
                       취소
                     </button>
@@ -613,9 +613,9 @@ export default function MyPage() {
                 userInfo.children.map((child, index) => (
                   <div
                     key={index}
-                    className="rounded-2xl p-6 border-2 border-blue-100 flex justify-between items-center"
+                    className="rounded-2xl p-6 flex justify-between items-center"
                   >
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-3 gap-16">
                       {childToEdit?.index === index ? (
                         <>
                           <div>
@@ -626,7 +626,7 @@ export default function MyPage() {
                               onChange={(e) =>
                                 handleEditChild(index, 'name', e.target.value)
                               }
-                              className="text-lg font-semibold border border-gray-300 rounded-md p-2"
+                              className="text-lg font-semibold border border-gray-300 rounded-md p-2 w-36 h-12"
                               required
                             />
                           </div>
@@ -653,7 +653,7 @@ export default function MyPage() {
                               onChange={(e) =>
                                 handleEditChild(index, 'gender', e.target.value)
                               }
-                              className="text-lg font-semibold border border-gray-300 rounded-md p-2"
+                              className="text-lg font-semibold border border-gray-300 rounded-md p-2 h-12"
                               required
                             >
                               <option value="male">남자</option>
@@ -684,18 +684,18 @@ export default function MyPage() {
                         </>
                       )}
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-1">
                       {childToEdit?.index === index ? (
                         <>
                           <button
                             onClick={() => handleSaveChild(index)}
-                            className="px-4 py-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200 transition-colors"
+                            className="px-4 py-2 bg-orange-200 text-gray-600 rounded-md hover:bg-orange-200 transition-colors flex items-center justify-center whitespace-nowrap"
                           >
                             저장
                           </button>
                           <button
                             onClick={() => setChildToEdit(null)}
-                            className="px-4 py-2 bg-gray-300 text-gray-600 rounded-md hover:bg-gray-400 transition-colors"
+                            className="px-4 py-2 bg-gray-300 text-gray-600 rounded-md hover:bg-gray-400 transition-colors flex items-center justify-center whitespace-nowrap"
                           >
                             취소
                           </button>

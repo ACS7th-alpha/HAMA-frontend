@@ -221,7 +221,7 @@ export default function ProductDetail() {
         </div>
 
         {/* 리뷰 섹션 - 조건부 렌더링 */}
-        {hasReviewData && (
+        {hasReviewData > 0 ? (
           <div className="mt-12 bg-white rounded-3xl shadow-lg p-8 relative">
             {/* 로그인하지 않은 경우 블러 처리 및 알림 */}
             {!isLoggedIn && (
@@ -363,6 +363,12 @@ export default function ProductDetail() {
                 </div>
               </div>
             )}
+          </div>
+        ) : (
+          <div className="mt-12 bg-white rounded-3xl shadow-lg p-8 mt-12 text-center">
+            <h2 className="text-2xl font-bold text-gray-800 mb-2 mt-12">해당 상품은 현재 분석 가능한 리뷰가 없습니다.</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">곧 더 많은 정보를 제공할 예정입니다!</h2>
+            
           </div>
         )}
       </div>
