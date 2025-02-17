@@ -54,11 +54,11 @@ export default function WritePage() {
       if (images.length > 0) {
         try {
           const imageUploadResponse = await fetch(
-            'http://localhost:3002/upload/multiple',
+            `${process.env.BACKEND_UPLOAD_URL}/upload/multiple`,
             {
               method: 'POST',
               headers: {
-                Authorization: `Bearer ${localStorage.getItem('access_token')}`, // 액세스 토큰 사용
+                Authorization: `Bearer ${localStorage.getItem('access_token')}`,
               },
               body: imageFormData,
             }
@@ -95,14 +95,17 @@ export default function WritePage() {
 
       console.log('전송할 리뷰 데이터:', reviewData);
 
-      const reviewResponse = await fetch('http://localhost:3004/reviews', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`, // 액세스 토큰 사용
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(reviewData),
-      });
+      const reviewResponse = await fetch(
+        `${process.env.BACKEND_REVIEW_URL}/reviews`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(reviewData),
+        }
+      );
 
       const responseText = await reviewResponse.text();
       console.log('서버 응답:', responseText);
@@ -226,7 +229,7 @@ export default function WritePage() {
               value={store}
               onChange={(e) => setStore(e.target.value)}
             />
-                      {/* 업로드 버튼 */}
+            {/* 업로드 버튼 */}
             <button
               className="mt-6 px-4 bg-orange-400 text-white py-2 rounded-lg hover:bg-orange-500 ml-auto block"
               onClick={handleSubmit}
@@ -234,7 +237,6 @@ export default function WritePage() {
               업로드
             </button>
           </div>
-      
         </div>
       </div>
     </div>

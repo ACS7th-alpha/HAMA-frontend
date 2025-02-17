@@ -45,12 +45,15 @@ export default function MyPage() {
       const token = localStorage.getItem('access_token');
       if (!token) throw new Error('로그인이 필요합니다.');
 
-      const response = await fetch(`http://localhost:3004/reviews/${postId}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${process.env.BACKEND_REVIEW_URL}/reviews/${postId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) throw new Error('글 삭제 실패');
 
@@ -69,12 +72,15 @@ export default function MyPage() {
       const token = localStorage.getItem('access_token');
       if (!token) throw new Error('로그인이 필요합니다.');
 
-      const response = await fetch('http://localhost:3004/reviews/my-reviews', {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${process.env.BACKEND_REVIEW_URL}/reviews/my-reviews`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok)
         throw new Error('내가 쓴 글을 불러오는 데 실패했습니다.');
@@ -99,13 +105,16 @@ export default function MyPage() {
       const accessToken = localStorage.getItem('access_token');
 
       // 예산 삭제 요청
-      const budgetResponse = await fetch('http://localhost:3005/budget', {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const budgetResponse = await fetch(
+        `${process.env.BACKEND_BUDGET_URL}/budget`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
       if (budgetResponse.status === 404) {
         console.log('예산 데이터가 없습니다.'); // 예외 처리
@@ -116,13 +125,16 @@ export default function MyPage() {
       }
 
       // 리뷰 삭제 요청
-      const reviewsResponse = await fetch('http://localhost:3004/reviews', {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const reviewsResponse = await fetch(
+        `${process.env.BACKEND_REVIEW_URL}/reviews`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
       if (reviewsResponse.status === 404) {
         console.log('리뷰 데이터가 없습니다.'); // 예외 처리
@@ -133,13 +145,16 @@ export default function MyPage() {
       }
 
       // 회원 탈퇴 요청
-      const response = await fetch('http://localhost:3001/auth/delete', {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(
+        `${process.env.BACKEND_AUTH_URL}/auth/delete`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
       if (!response.ok) throw new Error('계정 삭제 실패');
 
@@ -166,7 +181,7 @@ export default function MyPage() {
 
       console.log(`Deleting child: ${childToDelete.name}`); // 삭제할 아기 이름 로그
       const response = await fetch(
-        `http://localhost:3001/auth/children/${childToDelete.name}`,
+        `${process.env.BACKEND_AUTH_URL}/auth/children/${childToDelete.name}`,
         {
           method: 'DELETE',
           headers: {
@@ -239,7 +254,7 @@ export default function MyPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:3001/auth/children/${encodeURIComponent(
+        `${process.env.BACKEND_AUTH_URL}/auth/children/${encodeURIComponent(
           originalName
         )}`,
         {
@@ -306,14 +321,17 @@ export default function MyPage() {
     console.log('Sending request body:', JSON.stringify(requestBody)); // 요청 본문 로그
 
     try {
-      const response = await fetch('http://localhost:3001/auth/children', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(requestBody),
-      });
+      const response = await fetch(
+        `${process.env.BACKEND_AUTH_URL}/auth/children`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
 
       if (!response.ok) {
         const errorDetails = await response.text();
@@ -353,17 +371,20 @@ export default function MyPage() {
     const accessToken = localStorage.getItem('access_token');
 
     try {
-      const response = await fetch('http://localhost:3001/auth/update', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          nickname: newNickname,
-          monthlyBudget: newBudget,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.BACKEND_AUTH_URL}/auth/update`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            nickname: newNickname,
+            monthlyBudget: newBudget,
+          }),
+        }
+      );
 
       const data = await response.json();
       console.log('Response from server:', data); // 서버 응답 로그
@@ -602,7 +623,7 @@ export default function MyPage() {
                     </button>
                     <button
                       onClick={handleCancelAddChild}
-                      className="px-4 py-2 bg-gray-300 text-gray-600 rounded-md hover:bg-gray-400 transition-colors flex items-center justify-center whitespace-nowrap" 
+                      className="px-4 py-2 bg-gray-300 text-gray-600 rounded-md hover:bg-gray-400 transition-colors flex items-center justify-center whitespace-nowrap"
                     >
                       취소
                     </button>

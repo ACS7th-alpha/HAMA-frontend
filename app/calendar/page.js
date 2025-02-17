@@ -41,11 +41,14 @@ export default function CalendarPage() {
           return;
         }
 
-        const response = await fetch('http://localhost:3005/budget/spending', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
+        const response = await fetch(
+          `${process.env.BACKEND_BUDGET_URL}/budget/spending`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
 
         if (response.status === 404) {
           // 데이터가 없는 경우 정상적으로 처리
@@ -314,14 +317,17 @@ export default function CalendarPage() {
         return;
       }
 
-      const response = await fetch('http://localhost:3005/budget/spendings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(requestBody),
-      });
+      const response = await fetch(
+        `${process.env.BACKEND_BUDGET_URL}/budget/spendings`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('지출 등록에 실패했습니다.');
@@ -332,7 +338,7 @@ export default function CalendarPage() {
 
       // 지출 등록 성공 후 전체 지출 내역을 다시 불러오기
       const spendingResponse = await fetch(
-        'http://localhost:3005/budget/spending',
+        `${process.env.BACKEND_BUDGET_URL}/budget/spending`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -424,7 +430,7 @@ export default function CalendarPage() {
       };
 
       const response = await fetch(
-        `http://localhost:3005/budget/spending/${spendingToEdit.uid}`,
+        `${process.env.BACKEND_BUDGET_URL}/budget/spending/${spendingToEdit.uid}`,
         {
           method: 'PUT',
           headers: {
@@ -439,7 +445,7 @@ export default function CalendarPage() {
         alert('지출이 수정되었습니다.');
         // 수정 후 전체 지출 데이터를 다시 불러옴
         const spendingResponse = await fetch(
-          'http://localhost:3005/budget/spending',
+          `${process.env.BACKEND_BUDGET_URL}/budget/spending`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -483,7 +489,7 @@ export default function CalendarPage() {
     try {
       const accessToken = localStorage.getItem('access_token');
       const response = await fetch(
-        `http://localhost:3005/budget/spending/${spendingId}`,
+        `${process.env.BACKEND_BUDGET_URL}/budget/spending/${spendingId}`,
         {
           method: 'DELETE',
           headers: {
@@ -497,7 +503,7 @@ export default function CalendarPage() {
 
         // 삭제 후 전체 지출 데이터를 다시 불러옴
         const spendingResponse = await fetch(
-          'http://localhost:3005/budget/spending',
+          `${process.env.BACKEND_BUDGET_URL}/budget/spending`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -529,13 +535,16 @@ export default function CalendarPage() {
 
     try {
       const accessToken = localStorage.getItem('access_token');
-      const response = await fetch('http://localhost:3006/analyze', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: formData,
-      });
+      const response = await fetch(
+        `${process.env.BACKEND_UPLOAD_URL}/analyze`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: formData,
+        }
+      );
 
       if (!response.ok) {
         throw new Error('OCR 분석에 실패했습니다.');
@@ -634,7 +643,7 @@ export default function CalendarPage() {
     return <div>Loading...</div>;
   }
 
-  return (  
+  return (
     <div className="min-h-screen bg-white">
       <Header />
       <main className="container mx-auto max-w-5xl">

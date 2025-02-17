@@ -46,7 +46,7 @@ export default function BudgetPage() {
   const fetchBudgetData = async () => {
     try {
       const accessToken = localStorage.getItem('access_token');
-      const response = await fetch('http://localhost:3005/budget', {
+      const response = await fetch(`${process.env.BACKEND_BUDGET_URL}/budget`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -160,11 +160,14 @@ export default function BudgetPage() {
   const fetchMonthlySpending = async () => {
     try {
       const accessToken = localStorage.getItem('access_token');
-      const response = await fetch('http://localhost:3005/budget/spending', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await fetch(
+        `${process.env.BACKEND_BUDGET_URL}/budget/spending`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -203,11 +206,14 @@ export default function BudgetPage() {
   const fetchSpendingData = async () => {
     try {
       const accessToken = localStorage.getItem('access_token');
-      const response = await fetch('http://localhost:3005/budget/spending', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await fetch(
+        `${process.env.BACKEND_BUDGET_URL}/budget/spending`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to fetch spending data');
@@ -372,7 +378,7 @@ export default function BudgetPage() {
         categories: categoryBudgets,
       };
 
-      const response = await fetch('http://localhost:3005/budget', {
+      const response = await fetch(`${process.env.BACKEND_BUDGET_URL}/budget`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -509,7 +515,9 @@ export default function BudgetPage() {
 
           <div className="flex gap-1 mb-10 mt-8">
             <div className="bg-white rounded-lg p-6 w-40">
-              <div className="text-black mb-1 text-center text-xl">당월 예산</div>
+              <div className="text-black mb-1 text-center text-xl">
+                당월 예산
+              </div>
               <div className="font-semibold text-black text-center text-xl">
                 {Number(monthlyBudget).toLocaleString()}원
               </div>
@@ -549,7 +557,7 @@ export default function BudgetPage() {
                     {spendingPercentage.toFixed(0)}%
                   </span>
                   <span
-                    className={ 
+                    className={
                       currentSpending > monthlyBudget
                         ? 'text-red-600'
                         : 'text-blue-600'

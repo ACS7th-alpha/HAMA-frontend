@@ -51,7 +51,7 @@ export default function HomePage() {
         // 지출 내역 조회 및 현재 월 지출액 계산
         try {
           const response = await fetch(
-            'http://localhost:3005/budget/spending',
+            `${process.env.BACKEND_BUDGET_URL}/budget/spending`,
             {
               headers: {
                 Authorization: `Bearer ${accessToken}`,
@@ -104,15 +104,18 @@ export default function HomePage() {
       const decoded = jwtDecode(credentialResponse.credential);
       console.log('2. 디코드된 Google 정보:', decoded);
 
-      const response = await fetch('http://localhost:3001/auth/google/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          googleId: decoded.sub,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.BACKEND_AUTH_URL}/auth/google/login`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            googleId: decoded.sub,
+          }),
+        }
+      );
 
       const data = await response.json();
       console.log('3. 백엔드 로그인 응답:', data);
@@ -126,11 +129,14 @@ export default function HomePage() {
         localStorage.removeItem('budget');
         // 2. 예산 데이터 가져오기
         try {
-          const budgetResponse = await fetch('http://localhost:3005/budget', {
-            headers: {
-              Authorization: `Bearer ${data.access_token}`,
-            },
-          });
+          const budgetResponse = await fetch(
+            `${process.env.BACKEND_BUDGET_URL}/budget`,
+            {
+              headers: {
+                Authorization: `Bearer ${data.access_token}`,
+              },
+            }
+          );
 
           if (budgetResponse.ok) {
             const budgetData = await budgetResponse.json();
@@ -162,11 +168,14 @@ export default function HomePage() {
     const accessToken = localStorage.getItem('access_token');
 
     try {
-      const response = await fetch('http://localhost:3005/budget/spending', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await fetch(
+        `${process.env.BACKEND_BUDGET_URL}/budget/spending`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();

@@ -2,7 +2,6 @@
 import Firstpage from './Firstpage';
 import UserDashboard from './UserDashboard';
 import Categoryproduct from './Categoryproduct';
-import CartBasedRecommendation from './CartBasedRecommendation';
 
 export default function HeroSection({ userInfo, childAge, monthlySpending }) {
   if (!userInfo) {

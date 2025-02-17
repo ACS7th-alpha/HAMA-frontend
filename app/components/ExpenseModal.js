@@ -6,20 +6,20 @@ export default function ExpenseModal({ isOpen, onClose, item }) {
     date: new Date().toISOString().split('T')[0],
     category: '',
     itemName: '',
-    amount: ''
+    amount: '',
   });
 
   // 카테고리 매핑 객체 추가
   const categoryMapping = {
-    '수유_이유용품': 'feeding',
-    '기저귀_물티슈': 'diaper',
-    '생활_위생용품': 'sanitary',
-    '스킨케어_화장품': 'skincare',
-    '식품': 'food',
-    '완구용품': 'toys',
-    '침구류': 'bedding',
-    '패션의류_잡화': 'fashion',
-    '기타': 'other'
+    수유_이유용품: 'feeding',
+    기저귀_물티슈: 'diaper',
+    생활_위생용품: 'sanitary',
+    스킨케어_화장품: 'skincare',
+    식품: 'food',
+    완구용품: 'toys',
+    침구류: 'bedding',
+    패션의류_잡화: 'fashion',
+    기타: 'other',
   };
 
   // 카테고리 옵션 추가
@@ -32,18 +32,18 @@ export default function ExpenseModal({ isOpen, onClose, item }) {
     { value: 'toys', label: '완구용품' },
     { value: 'bedding', label: '침구류' },
     { value: 'fashion', label: '패션의류/잡화' },
-    { value: 'other', label: '기타' }
+    { value: 'other', label: '기타' },
   ];
 
   // item이 변경될 때마다 expenseData 업데이트
   useEffect(() => {
     if (item) {
-      const mappedCategory = categoryMapping[item.category] || 'other';  
+      const mappedCategory = categoryMapping[item.category] || 'other';
       setExpenseData({
         date: new Date().toISOString().split('T')[0],
         category: mappedCategory,
         itemName: item.name || '',
-        amount: item.sale_price?.replace(/[^0-9]/g, '') || ''
+        amount: item.sale_price?.replace(/[^0-9]/g, '') || '',
       });
     }
   }, [item]);
@@ -52,24 +52,27 @@ export default function ExpenseModal({ isOpen, onClose, item }) {
     e.preventDefault();
     try {
       const accessToken = localStorage.getItem('access_token');
-      
+
       const requestData = {
         date: expenseData.date,
         category: expenseData.category,
         itemName: expenseData.itemName,
-        amount: parseInt(expenseData.amount)
+        amount: parseInt(expenseData.amount),
       };
 
       console.log('Request Data:', requestData);
 
-      const response = await fetch('http://localhost:3005/budget/spending', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`
-        },
-        body: JSON.stringify(requestData)
-      });
+      const response = await fetch(
+        `${process.env.BACKEND_BUDGET_URL}/budget/spending`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(requestData),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -97,7 +100,9 @@ export default function ExpenseModal({ isOpen, onClose, item }) {
             <input
               type="date"
               value={expenseData.date}
-              onChange={(e) => setExpenseData({...expenseData, date: e.target.value})}
+              onChange={(e) =>
+                setExpenseData({ ...expenseData, date: e.target.value })
+              }
               className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-pink-500 focus:outline-none"
               required
             />
@@ -106,12 +111,14 @@ export default function ExpenseModal({ isOpen, onClose, item }) {
             <label className="block text-gray-700 mb-2">카테고리</label>
             <select
               value={expenseData.category}
-              onChange={(e) => setExpenseData({...expenseData, category: e.target.value})}
+              onChange={(e) =>
+                setExpenseData({ ...expenseData, category: e.target.value })
+              }
               className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-pink-500 focus:outline-none"
               required
             >
               <option value="">카테고리 선택</option>
-              {categoryOptions.map(option => (
+              {categoryOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -123,7 +130,9 @@ export default function ExpenseModal({ isOpen, onClose, item }) {
             <input
               type="text"
               value={expenseData.itemName}
-              onChange={(e) => setExpenseData({...expenseData, itemName: e.target.value})}
+              onChange={(e) =>
+                setExpenseData({ ...expenseData, itemName: e.target.value })
+              }
               className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-pink-500 focus:outline-none"
               required
             />
@@ -133,7 +142,9 @@ export default function ExpenseModal({ isOpen, onClose, item }) {
             <input
               type="number"
               value={expenseData.amount}
-              onChange={(e) => setExpenseData({...expenseData, amount: e.target.value})}
+              onChange={(e) =>
+                setExpenseData({ ...expenseData, amount: e.target.value })
+              }
               className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-pink-500 focus:outline-none"
               required
             />

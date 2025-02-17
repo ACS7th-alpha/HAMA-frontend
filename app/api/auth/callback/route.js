@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
-import api from "@/utils/axios";
+import { NextResponse } from 'next/server';
+import api from '@/utils/axios';
 
 export async function POST(request) {
   try {
     const { credential } = await request.json();
 
     const backendResponse = await api.post(
-      "http://localhost:3001/auth/google/login",
+      `${process.env.BACKEND_AUTH_URL}/auth/google/login`,
       {
         credential,
       }
@@ -14,19 +14,19 @@ export async function POST(request) {
 
     if (backendResponse.data.isNewUser) {
       return NextResponse.json({
-        redirect: "/signup",
+        redirect: '/signup',
         userData: backendResponse.data.userData,
       });
     }
 
     return NextResponse.json({
       token: backendResponse.data.token,
-      redirect: "/dashboard",
+      redirect: '/dashboard',
     });
   } catch (error) {
-    console.error("Auth error:", error);
+    console.error('Auth error:', error);
     return NextResponse.json(
-      { error: "Authentication failed" },
+      { error: 'Authentication failed' },
       { status: 500 }
     );
   }
