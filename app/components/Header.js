@@ -243,7 +243,7 @@ export default function Header({ onLogin }) {
               {/* 장바구니 버튼 */}
               <Link
                 href="/shoppingcart"
-                className="flex flex-col items-center  px-2 py-2 text-pink-600 rounded-lg hover:bg-blue-200 transition-colors"
+                className="flex flex-col items-center  px-2 py-2 text-black rounded-lg hover:bg-blue-200 transition-colors"
               >
                 <span className="text-2xl">🛒</span>
                 <span className="text-sm font-semibold">장바구니</span>
@@ -252,7 +252,7 @@ export default function Header({ onLogin }) {
               {/* 마이페이지 버튼 */}
               <Link
                 href="/mypage"
-                className="flex flex-col items-center px-2 py-2 text-orange-600 rounded-lg hover:bg-orange-200 transition-colors"
+                className="flex flex-col items-center px-2 py-2 text-black rounded-lg hover:bg-orange-200 transition-colors"
               >
                 <span className="text-2xl">👤</span>
                 <span className="text-sm font-semibold">마이페이지</span>
@@ -261,7 +261,7 @@ export default function Header({ onLogin }) {
               {/* 로그아웃 버튼 */}
               <button
                 onClick={handleLogout}
-                className="flex flex-col items-center px-2 py-2 text-gray-600 rounded-lg font-semibold bg-white hover:bg-pink-200 transition-colors"
+                className="flex flex-col items-center px-2 py-2 text-gray-700 rounded-lg font-semibold bg-white hover:bg-pink-200 transition-colors"
               >
                 <span className="text-2xl">🚪</span>
                 <span className="text-sm font-semibold">로그아웃</span>

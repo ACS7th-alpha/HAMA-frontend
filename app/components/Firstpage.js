@@ -34,19 +34,6 @@ export default function Firstpage({ images = [], currentImage = 0 }) {
             월별 소비 내역 및 카테고리별 지출 통계를 통해 
             육아 비용을 체계적으로 관리합니다.
           </p>
-          <div className="flex justify-center space-x-4">
-            <button
-              onClick={() => signIn('google')}
-              className="px-8 py-4 bg-yellow-400 text-white rounded-full font-semibold shadow-lg hover:bg-yellow-500 transform hover:-translate-y-1 transition-all duration-200 flex items-center"
-            >
-              <span className="mr-2">🎯</span>
-              로그인하기
-            </button>
-            <button className="px-8 py-4 bg-pink-100 text-pink-600 rounded-full font-semibold shadow-lg hover:bg-pink-200 transform hover:-translate-y-1 transition-all duration-200 flex items-center">
-              <span className="mr-2">✏️</span>
-              회원가입
-            </button>
-          </div>
         </div>
 
         <div className="relative mt-16">

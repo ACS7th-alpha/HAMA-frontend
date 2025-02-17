@@ -55,10 +55,11 @@ export default function CartBasedRecommendation() {
       고객님의 장바구니에 담긴 상품을 기반으로 추천드려요
       </h2>
       
+
       {/* 장바구니 상품 목록 */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {cartItems.map((item) => (
-          <div key={item.uid} className="relative bg-white rounded-xl shadow-md p-4">
+          <div key={item.uid} className="relative bg-white rounded-xl shadow-md p-4 flex flex-col">
             <div className="relative pb-[100%] mb-4">
               <img
                 src={item.img}
@@ -70,18 +71,21 @@ export default function CartBasedRecommendation() {
             <h3 className="text-md font-semibold text-gray-800 mb-2 line-clamp-2">
               {item.name}
             </h3>
-            <button
-              onClick={() => fetchBrandProducts(item.brand)}
-              className={`mt-2 px-4 py-2 rounded-lg text-sm transition-colors duration-200 
-                ${selectedBrand === item.brand 
-                  ? 'bg-pink-500 text-white' 
-                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
-            >
-              같은 브랜드 보기
-            </button>
+            <div className="mt-auto">
+              <button
+                onClick={() => fetchBrandProducts(item.brand)}
+                className={`px-4 py-2 rounded-lg text-sm transition-colors duration-200 
+                  ${selectedBrand === item.brand 
+                    ? 'bg-orange-500 text-white' 
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
+              >
+                같은 브랜드 보기
+              </button>
+            </div>
           </div>
         ))}
       </div>
+
 
       {/* 추천 상품 목록 */}
       {recommendedProducts.length > 0 && (
@@ -108,7 +112,7 @@ export default function CartBasedRecommendation() {
                   <h3 className="text-md font-semibold text-gray-800 mb-2 line-clamp-2">
                     {product.name}
                   </h3>
-                  <p className="text-lg font-bold text-pink-500">
+                  <p className="text-lg font-bold text-black">
                     {product.sale_price}
                   </p>
                 </div>
