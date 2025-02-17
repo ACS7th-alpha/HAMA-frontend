@@ -338,7 +338,7 @@ export default function CalendarPage() {
 
       // 지출 등록 성공 후 전체 지출 내역을 다시 불러오기
       const spendingResponse = await fetch(
-        `${process.env.NEXT_PUBLIC__BUDGET_URL}/budget/spending`,
+        `${process.env.NEXT_PUBLIC_BACKEND_BUDGET_URL}/budget/spending`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
