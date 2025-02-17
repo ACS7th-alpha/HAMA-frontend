@@ -110,7 +110,7 @@ export default function ChatButton() {
 
     try {
       const response = await fetch(
-        `${process.env.BACKEND_CHAT_URL}/perplexity/ask`,
+        `${process.env.NEXT_PUBLIC_BACKEND_CHAT_URL}/perplexity/ask`,
         {
           method: 'POST',
           headers: {
@@ -230,7 +230,7 @@ export default function ChatButton() {
 
     try {
       const response = await fetch(
-        `${process.env.BACKEND_CHAT_URL}/perplexity/ask`,
+        `${process.env.NEXT_PUBLIC_BACKEND_CHAT_URL}/perplexity/ask`,
         {
           method: 'POST',
           headers: headers,

@@ -39,11 +39,11 @@ export default function ProductList() {
         let url;
         if (category === '전체') {
           url = `${
-            process.env.BACKEND_SEARCH_URL
+            process.env.NEXT_PUBLIC_BACKEND_SEARCH_URL
           }/products?random=${Math.random()}`; // 모든 상품 가져오기
         } else {
           url = `${
-            process.env.BACKEND_SEARCH_URL
+            process.env.NEXT_PUBLIC_BACKEND_SEARCH_URL
           }/products/category/${category}?random=${Math.random()}`;
         }
 

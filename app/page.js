@@ -51,7 +51,7 @@ export default function HomePage() {
         // 지출 내역 조회 및 현재 월 지출액 계산
         try {
           const response = await fetch(
-            `${process.env.BACKEND_BUDGET_URL}/budget/spending`,
+            `${process.env.NEXT_PUBLIC_BACKEND_BUDGET_URL}/budget/spending`,
             {
               headers: {
                 Authorization: `Bearer ${accessToken}`,
@@ -105,7 +105,7 @@ export default function HomePage() {
       console.log('2. 디코드된 Google 정보:', decoded);
 
       const response = await fetch(
-        `${process.env.BACKEND_AUTH_URL}/auth/google/login`,
+        `${process.env.NEXT_PUBLIC_BACKEND_AUTH_URL}/auth/google/login`,
         {
           method: 'POST',
           headers: {
@@ -130,7 +130,7 @@ export default function HomePage() {
         // 2. 예산 데이터 가져오기
         try {
           const budgetResponse = await fetch(
-            `${process.env.BACKEND_BUDGET_URL}/budget`,
+            `${process.env.NEXT_PUBLIC_BACKEND_BUDGET_URL}/budget`,
             {
               headers: {
                 Authorization: `Bearer ${data.access_token}`,
@@ -169,7 +169,7 @@ export default function HomePage() {
 
     try {
       const response = await fetch(
-        `${process.env.BACKEND_BUDGET_URL}/budget/spending`,
+        `${process.env.NEXT_PUBLIC_BACKEND_BUDGET_URL}/budget/spending`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,

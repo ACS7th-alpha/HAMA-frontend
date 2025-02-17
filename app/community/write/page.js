@@ -54,7 +54,7 @@ export default function WritePage() {
       if (images.length > 0) {
         try {
           const imageUploadResponse = await fetch(
-            `${process.env.BACKEND_UPLOAD_URL}/upload/multiple`,
+            `${process.env.NEXT_PUBLIC_BACKEND_UPLOAD_URL}/upload/multiple`,
             {
               method: 'POST',
               headers: {
@@ -96,7 +96,7 @@ export default function WritePage() {
       console.log('전송할 리뷰 데이터:', reviewData);
 
       const reviewResponse = await fetch(
-        `${process.env.BACKEND_REVIEW_URL}/reviews`,
+        `${process.env.NEXT_PUBLIC_BACKEND_REVIEW_URL}/reviews`,
         {
           method: 'POST',
           headers: {

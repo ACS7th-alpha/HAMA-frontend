@@ -50,7 +50,7 @@ export default function Header({ onLogin }) {
       console.log('갱신 요청 시작...');
 
       const response = await fetch(
-        `${process.env.BACKEND_AUTH_URL}/auth/refresh`,
+        `${process.env.NEXT_PUBLIC_BACKEND_AUTH_URL}/auth/refresh`,
         {
           method: 'POST',
           headers: {

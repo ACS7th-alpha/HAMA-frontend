@@ -20,7 +20,7 @@ export default function SearchResults() {
       try {
         const response = await fetch(
           `${
-            process.env.BACKEND_SEARCH_URL
+            process.env.NEXT_PUBLIC_BACKEND_SEARCH_URL
           }/search?keyword=${encodeURIComponent(
             keyword
           )}&page=${page}&limit=${limit}`

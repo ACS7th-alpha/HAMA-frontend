@@ -14,7 +14,7 @@ export default function ProductDetail() {
   const params = useParams();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const userInfo = JSON.parse(localStorage.getItem('user'));
-  const [token, setToken] = useState(null); // token state 추가
+  const [token, setToken] = useState(null);
 
   const categoryIcons = {
     기저귀_물티슈: '👶',
@@ -34,24 +34,27 @@ export default function ProductDetail() {
       }
 
       // POST 요청으로 상품을 장바구니에 추가
-      const response = await fetch(`${process.env.BACKEND_CART_URL}/cart/add`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          site: product.site,
-          category: product.category,
-          link: product.link,
-          uid: product.uid,
-          name: product.name,
-          brand: product.brand,
-          sale_price: product.sale_price,
-          img: product.img,
-          quantity: 1, // 기본값 1로 설정
-        }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_CART_URL}/cart/add`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            site: product.site,
+            category: product.category,
+            link: product.link,
+            uid: product.uid,
+            name: product.name,
+            brand: product.brand,
+            sale_price: product.sale_price,
+            img: product.img,
+            quantity: 1, // 기본값 1로 설정
+          }),
+        }
+      );
 
       if (response.ok) {
         const result = await response.json();
@@ -74,7 +77,7 @@ export default function ProductDetail() {
       setLoading(true);
       try {
         const response = await fetch(
-          `${process.env.BACKEND_SEARCH_URL}/products/${params.uid}`
+          `${process.env.NEXT_PUBLIC_BACKEND_SEARCH_URL}/products/${params.uid}`
         );
         if (!response.ok) throw new Error('상품을 불러올 수 없습니다.');
 
@@ -92,13 +95,23 @@ export default function ProductDetail() {
   }, [params?.uid]); // params.uid 변경 시 다시 요청
 
   useEffect(() => {
+    const accessToken = localStorage.getItem('access_token');
+    console.log('Access Token:', accessToken ? 'exists' : 'not found');
+    console.log('User Info:', userInfo);
+
     if (userInfo) {
       setIsLoggedIn(true);
+      console.log('User is logged in');
+    } else {
+      console.log('User is not logged in');
     }
   }, [userInfo]);
 
-  // 리뷰 데이터 존재 여부 확인
-  const hasReviewData = product?.additionalInfo;
+  // 리뷰 데이터 존재 여부 체크 - 실제 데이터 존재 여부 확인
+  const hasReviewData =
+    product?.additionalInfo &&
+    (product.additionalInfo.review_summary.advantages?.length > 0 ||
+      product.additionalInfo.review_summary.disadvantages?.length > 0);
 
   if (loading) {
     return (
@@ -226,160 +239,169 @@ export default function ProductDetail() {
           </div>
         </div>
 
-        {/* 리뷰 섹션 - 조건부 렌더링 */}
-        {hasReviewData ? (
-          <div className="mt-12 bg-white rounded-3xl shadow-lg p-8 relative">
-            {/* 로그인하지 않은 경우 블러 처리 및 알림 */}
-            {!isLoggedIn && (
-              <>
-                {/* 블러 레이어 */}
-                <div className="absolute inset-0 bg-white/30 backdrop-blur-md rounded-3xl z-40" />
-                {/* 컨텐츠 레이어 */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center z-50 p-8">
-                  <div className="text-6xl mb-4">🔒</div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">
-                    로그인이 필요한 기능입니다
-                  </h3>
-                  <p className="text-gray-600 mb-6">
-                    상세한 리뷰 분석을 보시려면 로그인해 주세요
-                  </p>
-                </div>
-              </>
-            )}
+        {/* 리뷰 섹션 */}
+        <div className="mt-12 bg-white rounded-3xl shadow-lg p-8 relative">
+          {console.log('Rendering Review Section')}
+          {console.log('Login Status:', isLoggedIn)}
+          {console.log('Review Data Status:', hasReviewData)}
+
+          {/* 로그인하지 않았거나 리뷰 데이터가 없는 경우 블러 처리 */}
+          {(!isLoggedIn || !hasReviewData) && (
+            <div className="absolute inset-0 z-50">
+              <div className="absolute inset-0 bg-white/30 backdrop-blur-md rounded-3xl" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <div className="text-6xl mb-4">🔒</div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">
+                  {!isLoggedIn
+                    ? '로그인이 필요한 기능입니다'
+                    : '리뷰 데이터가 없습니다'}
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  {!isLoggedIn
+                    ? '상세한 리뷰 분석을 보시려면 로그인해 주세요'
+                    : '곧 더 많은 정보를 제공할 예정입니다'}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* 리뷰 컨텐츠 */}
+          <div className={!isLoggedIn || !hasReviewData ? 'opacity-50' : ''}>
             <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center flex items-center justify-center gap-2">
               <span className="text-2xl">✨</span>
               실제 구매자 리뷰 분석
               <span className="text-2xl">✨</span>
             </h2>
-            {/* 리뷰 통계 - 개별 도넛 차트 */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-12">
-              {/* 긍정적 리뷰 차트 */}
-              <div className=" rounded-2xl p-6 relative">
-                <div className="w-40 h-40 mx-auto">
-                  <Doughnut
-                    data={createChartData(
-                      product.additionalInfo.review_percent.positive,
-                      'rgba(34, 197, 94, 0.8)' // 녹색
-                    )}
-                    options={chartOptions}
-                  />
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                    <div className="text-2xl font-bold text-green-600">
-                      {product.additionalInfo.review_percent.positive?.toFixed(
-                        1
-                      )}
-                      %
-                    </div>
-                    <div className="text-sm text-gray-600">긍정적</div>
-                  </div>
-                </div>
-              </div>
 
-              {/* 부정적 리뷰 차트 */}
-              <div className="rounded-2xl p-6 relative">
-                <div className="w-40 h-40 mx-auto">
-                  <Doughnut
-                    data={createChartData(
-                      product.additionalInfo.review_percent.negative,
-                      'rgba(239, 68, 68, 0.8)' // 빨간색
-                    )}
-                    options={chartOptions}
-                  />
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                    <div className="text-2xl font-bold text-red-600">
-                      {product.additionalInfo.review_percent.negative?.toFixed(
-                        1
-                      )}
-                      %
-                    </div>
-                    <div className="text-sm text-gray-600">부정적</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 중립적 리뷰 차트 */}
-              <div className=" rounded-2xl p-6 relative">
-                <div className="w-40 h-40 mx-auto">
-                  <Doughnut
-                    data={createChartData(
-                      product.additionalInfo.review_percent.neutral,
-                      'rgba(156, 163, 175, 0.8)' // 회색
-                    )}
-                    options={chartOptions}
-                  />
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                    <div className="text-2xl font-bold text-gray-600">
-                      {product.additionalInfo.review_percent.neutral?.toFixed(
-                        1
-                      )}
-                      %
-                    </div>
-                    <div className="text-sm text-gray-600">중립적</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* 장점 */}
-            {product.additionalInfo.review_summary.advantages?.length > 0 && (
-              <div className="mb-8 px-12">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2 bg-green-50 p-4 rounded-xl">
-                  <span className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white">
-                    <span className="text-xl">👍</span>
-                  </span>
-                  <span>이런 점이 좋아요!</span>
-                </h3>
-                <div className="grid gap-3 pl-4">
-                  {product.additionalInfo.review_summary.advantages.map(
-                    (advantage, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center gap-3 bg-white p-4 rounded-xl border border-green-100 hover:border-green-200 transition-colors"
-                      >
-                        <span className="text-green-500 font-bold">✓</span>
-                        <span className="text-gray-700">{advantage}</span>
+            {/* 리뷰 데이터가 있는 경우에만 차트와 상세 내용 표시 */}
+            {hasReviewData && (
+              <div>
+                {console.log('Rendering: Full Review Data View')}
+                {/* 리뷰 통계 - 개별 도넛 차트 */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-12">
+                  {/* 긍정적 리뷰 차트 */}
+                  <div className=" rounded-2xl p-6 relative">
+                    <div className="w-40 h-40 mx-auto">
+                      <Doughnut
+                        data={createChartData(
+                          product.additionalInfo.review_percent.positive,
+                          'rgba(34, 197, 94, 0.8)' // 녹색
+                        )}
+                        options={chartOptions}
+                      />
+                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                        <div className="text-2xl font-bold text-green-600">
+                          {product.additionalInfo.review_percent.positive?.toFixed(
+                            1
+                          )}
+                          %
+                        </div>
+                        <div className="text-sm text-gray-600">긍정적</div>
                       </div>
-                    )
-                  )}
-                </div>
-              </div>
-            )}
+                    </div>
+                  </div>
 
-            {/* 단점 */}
-            {product.additionalInfo.review_summary.disadvantages?.length >
-              0 && (
-              <div className="mb-8 px-12">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2 bg-red-50 p-4 rounded-xl">
-                  <span className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white">
-                    <span className="text-xl">👎</span>
-                  </span>
-                  <span>이런 점은 아쉬워요</span>
-                </h3>
-                <div className="grid gap-3 pl-4">
-                  {product.additionalInfo.review_summary.disadvantages.map(
-                    (disadvantage, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center gap-3 bg-white p-4 rounded-xl border border-red-100 hover:border-red-200 transition-colors"
-                      >
-                        <span className="text-red-500 font-bold">!</span>
-                        <span className="text-gray-700">{disadvantage}</span>
+                  {/* 부정적 리뷰 차트 */}
+                  <div className="rounded-2xl p-6 relative">
+                    <div className="w-40 h-40 mx-auto">
+                      <Doughnut
+                        data={createChartData(
+                          product.additionalInfo.review_percent.negative,
+                          'rgba(239, 68, 68, 0.8)' // 빨간색
+                        )}
+                        options={chartOptions}
+                      />
+                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                        <div className="text-2xl font-bold text-red-600">
+                          {product.additionalInfo.review_percent.negative?.toFixed(
+                            1
+                          )}
+                          %
+                        </div>
+                        <div className="text-sm text-gray-600">부정적</div>
                       </div>
-                    )
-                  )}
+                    </div>
+                  </div>
+
+                  {/* 중립적 리뷰 차트 */}
+                  <div className=" rounded-2xl p-6 relative">
+                    <div className="w-40 h-40 mx-auto">
+                      <Doughnut
+                        data={createChartData(
+                          product.additionalInfo.review_percent.neutral,
+                          'rgba(156, 163, 175, 0.8)' // 회색
+                        )}
+                        options={chartOptions}
+                      />
+                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                        <div className="text-2xl font-bold text-gray-600">
+                          {product.additionalInfo.review_percent.neutral?.toFixed(
+                            1
+                          )}
+                          %
+                        </div>
+                        <div className="text-sm text-gray-600">중립적</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+                {/* 장점 */}
+                {product.additionalInfo.review_summary.advantages?.length >
+                  0 && (
+                  <div className="mb-8 px-12">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2 bg-green-50 p-4 rounded-xl">
+                      <span className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white">
+                        <span className="text-xl">👍</span>
+                      </span>
+                      <span>이런 점이 좋아요!</span>
+                    </h3>
+                    <div className="grid gap-3 pl-4">
+                      {product.additionalInfo.review_summary.advantages.map(
+                        (advantage, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center gap-3 bg-white p-4 rounded-xl border border-green-100 hover:border-green-200 transition-colors"
+                          >
+                            <span className="text-green-500 font-bold">✓</span>
+                            <span className="text-gray-700">{advantage}</span>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* 단점 */}
+                {product.additionalInfo.review_summary.disadvantages?.length >
+                  0 && (
+                  <div className="mb-8 px-12">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2 bg-red-50 p-4 rounded-xl">
+                      <span className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white">
+                        <span className="text-xl">👎</span>
+                      </span>
+                      <span>이런 점은 아쉬워요</span>
+                    </h3>
+                    <div className="grid gap-3 pl-4">
+                      {product.additionalInfo.review_summary.disadvantages.map(
+                        (disadvantage, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center gap-3 bg-white p-4 rounded-xl border border-red-100 hover:border-red-200 transition-colors"
+                          >
+                            <span className="text-red-500 font-bold">!</span>
+                            <span className="text-gray-700">
+                              {disadvantage}
+                            </span>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
-        ) : (
-          <div className="mt-12 bg-white rounded-3xl shadow-lg p-8 mt-12 text-center">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2 mt-12">
-              해당 상품은 현재 분석 가능한 리뷰가 없습니다.
-            </h2>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              곧 더 많은 정보를 제공할 예정입니다!
-            </h2>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );

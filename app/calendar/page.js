@@ -42,7 +42,7 @@ export default function CalendarPage() {
         }
 
         const response = await fetch(
-          `${process.env.BACKEND_BUDGET_URL}/budget/spending`,
+          `${process.env.NEXT_PUBLIC_BACKEND_BUDGET_URL}/budget/spending`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -318,7 +318,7 @@ export default function CalendarPage() {
       }
 
       const response = await fetch(
-        `${process.env.BACKEND_BUDGET_URL}/budget/spendings`,
+        `${process.env.NEXT_PUBLIC_BACKEND_BUDGET_URL}/budget/spendings`,
         {
           method: 'POST',
           headers: {
@@ -338,7 +338,7 @@ export default function CalendarPage() {
 
       // 지출 등록 성공 후 전체 지출 내역을 다시 불러오기
       const spendingResponse = await fetch(
-        `${process.env.BACKEND_BUDGET_URL}/budget/spending`,
+        `${process.env.NEXT_PUBLIC__BUDGET_URL}/budget/spending`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -430,7 +430,7 @@ export default function CalendarPage() {
       };
 
       const response = await fetch(
-        `${process.env.BACKEND_BUDGET_URL}/budget/spending/${spendingToEdit.uid}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_BUDGET_URL}/budget/spending/${spendingToEdit.uid}`,
         {
           method: 'PUT',
           headers: {
@@ -445,7 +445,7 @@ export default function CalendarPage() {
         alert('지출이 수정되었습니다.');
         // 수정 후 전체 지출 데이터를 다시 불러옴
         const spendingResponse = await fetch(
-          `${process.env.BACKEND_BUDGET_URL}/budget/spending`,
+          `${process.env.NEXT_PUBLIC_BACKEND_BUDGET_URL}/budget/spending`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -489,7 +489,7 @@ export default function CalendarPage() {
     try {
       const accessToken = localStorage.getItem('access_token');
       const response = await fetch(
-        `${process.env.BACKEND_BUDGET_URL}/budget/spending/${spendingId}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_BUDGET_URL}/budget/spending/${spendingId}`,
         {
           method: 'DELETE',
           headers: {
@@ -503,7 +503,7 @@ export default function CalendarPage() {
 
         // 삭제 후 전체 지출 데이터를 다시 불러옴
         const spendingResponse = await fetch(
-          `${process.env.BACKEND_BUDGET_URL}/budget/spending`,
+          `${process.env.NEXT_PUBLIC_BACKEND_BUDGET_URL}/budget/spending`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -536,7 +536,7 @@ export default function CalendarPage() {
     try {
       const accessToken = localStorage.getItem('access_token');
       const response = await fetch(
-        `${process.env.BACKEND_UPLOAD_URL}/analyze`,
+        `${process.env.NEXT_PUBLIC_BACKEND_UPLOAD_URL}/analyze`,
         {
           method: 'POST',
           headers: {

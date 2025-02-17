@@ -69,7 +69,7 @@ export default function StatisticsPage() {
         }
 
         const response = await fetch(
-          `${process.env.BACKEND_BUDGET_URL}/budget/spending`,
+          `${process.env.NEXT_PUBLIC__BUDGET_URL}/budget/spending`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,

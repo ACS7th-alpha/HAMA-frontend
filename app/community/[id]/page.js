@@ -17,7 +17,7 @@ export default function ProductDetail({ params }) {
     const fetchProduct = async () => {
       try {
         const response = await fetch(
-          `${process.env.BACKEND_REVIEW_URL}/reviews/${id}`
+          `${process.env.NEXT_PUBLIC_BACKEND_REVIEW_URL}/reviews/${id}`
         );
         if (!response.ok)
           throw new Error('상품 정보를 불러오는데 실패했습니다.');
@@ -36,7 +36,7 @@ export default function ProductDetail({ params }) {
     const fetchOtherProducts = async () => {
       try {
         const response = await fetch(
-          `${process.env.BACKEND_REVIEW_URL}/reviews`
+          `${process.env.NEXT_PUBLIC_BACKEND_REVIEW_URL}/reviews`
         );
         if (!response.ok) throw new Error('데이터를 불러오는데 실패했습니다.');
 

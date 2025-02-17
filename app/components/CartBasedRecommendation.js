@@ -33,7 +33,7 @@ export default function CartBasedRecommendation() {
     try {
       const response = await fetch(
         `${
-          process.env.BACKEND_SEARCH_URL
+          process.env.NEXT_PUBLIC_BACKEND_SEARCH_URL
         }/products/search?keyword=${encodeURIComponent(brand)}&page=1&limit=4`
       );
 

@@ -48,9 +48,9 @@ export default function CategoryProduct() {
       try {
         let url;
         if (category === '전체') {
-          url = `${process.env.BACKEND_SEARCH_URL}/products?page=${page}&limit=${limit}`;
+          url = `${process.env.NEXT_PUBLIC_BACKEND_SEARCH_URL}/products?page=${page}&limit=${limit}`;
         } else {
-          url = `${process.env.BACKEND_SEARCH_URL}/products/category/${category}?page=${page}&limit=${limit}`;
+          url = `${process.env.NEXT_PUBLIC_BACKEND_SEARCH_URL}/products/category/${category}?page=${page}&limit=${limit}`;
         }
 
         const response = await fetch(url);

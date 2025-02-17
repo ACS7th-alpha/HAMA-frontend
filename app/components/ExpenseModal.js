@@ -63,7 +63,7 @@ export default function ExpenseModal({ isOpen, onClose, item }) {
       console.log('Request Data:', requestData);
 
       const response = await fetch(
-        `${process.env.BACKEND_BUDGET_URL}/budget/spending`,
+        `${process.env.NEXT_PUBLIC_BACKEND_BUDGET_URL}/budget/spending`,
         {
           method: 'POST',
           headers: {

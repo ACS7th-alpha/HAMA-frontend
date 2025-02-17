@@ -46,7 +46,7 @@ export default function MyPage() {
       if (!token) throw new Error('로그인이 필요합니다.');
 
       const response = await fetch(
-        `${process.env.BACKEND_REVIEW_URL}/reviews/${postId}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_REVIEW_URL}/reviews/${postId}`,
         {
           method: 'DELETE',
           headers: {
@@ -73,7 +73,7 @@ export default function MyPage() {
       if (!token) throw new Error('로그인이 필요합니다.');
 
       const response = await fetch(
-        `${process.env.BACKEND_REVIEW_URL}/reviews/my-reviews`,
+        `${process.env.NEXT_PUBLIC_BACKEND_REVIEW_URL}/reviews/my-reviews`,
         {
           method: 'GET',
           headers: {
@@ -106,7 +106,7 @@ export default function MyPage() {
 
       // 예산 삭제 요청
       const budgetResponse = await fetch(
-        `${process.env.BACKEND_BUDGET_URL}/budget`,
+        `${process.env.NEXT_PUBLIC_BACKEND_BUDGET_URL}/budget`,
         {
           method: 'DELETE',
           headers: {
@@ -126,7 +126,7 @@ export default function MyPage() {
 
       // 리뷰 삭제 요청
       const reviewsResponse = await fetch(
-        `${process.env.BACKEND_REVIEW_URL}/reviews`,
+        `${process.env.NEXT_PUBLIC_BACKEND_REVIEW_URL}/reviews`,
         {
           method: 'DELETE',
           headers: {
@@ -146,7 +146,7 @@ export default function MyPage() {
 
       // 회원 탈퇴 요청
       const response = await fetch(
-        `${process.env.BACKEND_AUTH_URL}/auth/delete`,
+        `${process.env.NEXT_PUBLIC__AUTH_URL}/auth/delete`,
         {
           method: 'DELETE',
           headers: {
@@ -181,7 +181,7 @@ export default function MyPage() {
 
       console.log(`Deleting child: ${childToDelete.name}`); // 삭제할 아기 이름 로그
       const response = await fetch(
-        `${process.env.BACKEND_AUTH_URL}/auth/children/${childToDelete.name}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_AUTH_URL}/auth/children/${childToDelete.name}`,
         {
           method: 'DELETE',
           headers: {
@@ -254,9 +254,9 @@ export default function MyPage() {
 
     try {
       const response = await fetch(
-        `${process.env.BACKEND_AUTH_URL}/auth/children/${encodeURIComponent(
-          originalName
-        )}`,
+        `${
+          process.env.NEXT_PUBLIC_BACKEND_AUTH_URL
+        }/auth/children/${encodeURIComponent(originalName)}`,
         {
           method: 'PUT',
           headers: {
@@ -322,7 +322,7 @@ export default function MyPage() {
 
     try {
       const response = await fetch(
-        `${process.env.BACKEND_AUTH_URL}/auth/children`,
+        `${process.env.NEXT_PUBLIC_BACKEND_AUTH_URL}/auth/children`,
         {
           method: 'POST',
           headers: {
@@ -372,7 +372,7 @@ export default function MyPage() {
 
     try {
       const response = await fetch(
-        `${process.env.BACKEND_AUTH_URL}/auth/update`,
+        `${process.env.NEXT_PUBLIC_BACKEND_AUTH_URL}/auth/update`,
         {
           method: 'PATCH',
           headers: {

@@ -98,7 +98,7 @@ export default function UserDashboard({
 
       // 검색 API 사용
       const searchUrl = `${
-        process.env.BACKEND_SEARCH_URL
+        process.env.NEXT_PUBLIC_BACKEND_SEARCH_URL
       }/products/search?keyword=${encodeURIComponent(
         keyword
       )}&page=${page}&limit=${limit}`;

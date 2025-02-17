@@ -25,11 +25,14 @@ export default function ShoppingCart() {
         return;
       }
 
-      const response = await fetch(`${process.env.BACKEND_CART_URL}/cart`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_CART_URL}/cart`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error('장바구니 조회에 실패했습니다.');
@@ -49,7 +52,7 @@ export default function ShoppingCart() {
     try {
       const accessToken = localStorage.getItem('access_token');
       const response = await fetch(
-        `${process.env.BACKEND_CART_URL}/cart/remove/${uid}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_CART_URL}/cart/remove/${uid}`,
         {
           method: 'DELETE',
           headers: {
@@ -74,7 +77,7 @@ export default function ShoppingCart() {
     try {
       const accessToken = localStorage.getItem('access_token');
       const response = await fetch(
-        `${process.env.BACKEND_CART_URL}/cart/clear`,
+        `${process.env.NEXT_PUBLIC_BACKEND_CART_URL}/cart/clear`,
         {
           method: 'DELETE',
           headers: {

@@ -46,11 +46,14 @@ export default function BudgetPage() {
   const fetchBudgetData = async () => {
     try {
       const accessToken = localStorage.getItem('access_token');
-      const response = await fetch(`${process.env.BACKEND_BUDGET_URL}/budget`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_BUDGET_URL}/budget`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
       // 404 에러(데이터 없음) 처리
       if (response.status === 404) {
@@ -161,7 +164,7 @@ export default function BudgetPage() {
     try {
       const accessToken = localStorage.getItem('access_token');
       const response = await fetch(
-        `${process.env.BACKEND_BUDGET_URL}/budget/spending`,
+        `${process.env.NEXT_PUBLIC_BACKEND_BUDGET_URL}/budget/spending`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -207,7 +210,7 @@ export default function BudgetPage() {
     try {
       const accessToken = localStorage.getItem('access_token');
       const response = await fetch(
-        `${process.env.BACKEND_BUDGET_URL}/budget/spending`,
+        `${process.env.NEXT_PUBLIC_BACKEND_BUDGET_URL}/budget/spending`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -378,14 +381,17 @@ export default function BudgetPage() {
         categories: categoryBudgets,
       };
 
-      const response = await fetch(`${process.env.BACKEND_BUDGET_URL}/budget`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(budgetData),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_BUDGET_URL}/budget`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(budgetData),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('예산 설정에 실패했습니다.');

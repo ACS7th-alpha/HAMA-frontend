@@ -6,7 +6,7 @@ export async function POST(request) {
     const { credential } = await request.json();
 
     const backendResponse = await api.post(
-      `${process.env.BACKEND_AUTH_URL}/auth/google/login`,
+      `${process.env.NEXT_PUBLIC_BACKEND_AUTH_URL}/auth/google/login`,
       {
         credential,
       }
