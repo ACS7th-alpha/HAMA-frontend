@@ -188,31 +188,35 @@ export default function UserDashboard({
             </div>
 
             {/* 예산 정보 섹션 */}
-            <div className="flex-1 ml-12">
-              <div className="bg-pink-10 rounded-2xl p-8 shadow-md border-2 border-blue-10">
+            <div className="flex-1 ml-12 ">
+              <div className="bg-pink-10 rounded-2xl p-6 shadow-md border-2 border-blue-10">
                 <div className="mb-4 text-left">
                   <p className="text-gray-800 flex items-center text-lg">
                     <span className="mr-2">💰</span> 이번 달 예산
                   </p>
-                  <p className="text-3xl font-bold text-black mt-2">
-                    {Number(userInfo.monthlyBudget)?.toLocaleString('ko-KR')}원
-                  </p>
+                  <div className="flex justify-between items-center mt-1">
+                    <p className="text-3xl font-bold text-black">
+                      {Number(userInfo.monthlyBudget)?.toLocaleString('ko-KR')}원
+                    </p>
+                    <p className="text-2xl font-bold text-gray-600 mr-1">
+                      {spendingPercentage2.toLocaleString()}%
+                    </p>
+                  </div>
                 </div>
-                <div className="w-full h-5 bg-white rounded-full overflow-hidden mt-4 shadow-inner">
+                <div className="w-full h-6 bg-white rounded-full overflow-hidden mt-4 shadow-inner">
                   <div
                     className="h-full bg-yellow-400 transition-all duration-500 rounded-full"
                     style={{ width: `${spendingPercentage}%` }}
                   ></div>
                 </div>
-                <div className="flex justify-between mt-3 text-gray-600">
+                <div className="flex justify-between mt-3 text-black">
                   <span className="flex items-center">
-                    <span className="mr-1">💸</span> 사용:{' '}
+                    <span className="mr-1">💸</span> 지출 {' '}
                     {monthlySpending.toLocaleString()}원
                   </span>
                   <span className="flex items-center ml-4">
-                    <span className="mr-1">✨</span> 사용:{' '}
-                    {spendingPercentage2.toLocaleString()}%{' '}
-                    <span className="text-gray-600 ml-2">
+                    <span className="mr-1">✨</span> 남은 예산 {' '}
+                    <span className="text-black ml-2">
                       {remainingBudget.toLocaleString()}원
                     </span>
                   </span>

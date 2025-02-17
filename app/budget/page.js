@@ -437,8 +437,8 @@ export default function BudgetPage() {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      <main className="max-w-7xl mx-auto px-8 flex flex-col">
-        <div className="max-w-4xl mx-auto w-full relative">
+      <main className="max-w-6xl mx-auto px-8 flex flex-col ">
+        <div className="max-w-3xl mx-auto w-full relative">
           <div className="absolute top-8 right-0">
             <button
               onClick={handleSave}
@@ -460,7 +460,7 @@ export default function BudgetPage() {
             </button>
           </div>
 
-          <div className="flex justify-center items-center mb-8 mt-8">
+          <div className="flex justify-center items-center mb-8 mt-8 ">
             <div className="flex items-center gap-4">
               <button
                 onClick={handlePrevMonth}
@@ -507,19 +507,19 @@ export default function BudgetPage() {
             </div>
           </div>
 
-          <div className="flex gap-4 mb-4 mt-16">
-            <div className="bg-white rounded-lg p-6 shadow-md w-40">
-              <div className="text-gray-600 mb-1 text-center">당월 예산</div>
-              <div className="font-bold text-black text-center">
+          <div className="flex gap-1 mb-10 mt-8">
+            <div className="bg-white rounded-lg p-6 w-40">
+              <div className="text-black mb-1 text-center text-xl">당월 예산</div>
+              <div className="font-semibold text-black text-center text-xl">
                 {Number(monthlyBudget).toLocaleString()}원
               </div>
             </div>
 
-            <div className="flex-1 bg-white rounded-lg p-6 shadow-md flex items-center">
-              <div className="relative w-full">
-                <div className="w-full bg-gray-100 rounded-full h-8">
+            <div className="flex-1 rounded-lg p-6 flex items-center">
+              <div className="relative w-full px-1">
+                <div className="w-full bg-gray-100 rounded-full h-10">
                   <div
-                    className={`h-8 rounded-full ${
+                    className={`h-10 rounded-full ${
                       currentSpending > monthlyBudget
                         ? 'bg-red-200'
                         : 'bg-blue-200'
@@ -529,7 +529,7 @@ export default function BudgetPage() {
                 </div>
 
                 <div
-                  className={`absolute top-0 left-4 h-8 flex items-center ${
+                  className={`absolute top-8 left-4 h-10 flex items-center ${
                     currentSpending > monthlyBudget
                       ? 'text-red-600'
                       : 'text-blue-600'
@@ -538,7 +538,7 @@ export default function BudgetPage() {
                   {currentSpending.toLocaleString()}원
                 </div>
 
-                <div className="absolute top-0 right-4 h-8 flex items-center gap-2">
+                <div className="absolute top-3 right-4 h-10 flex flex-col items-center gap-2">
                   <span
                     className={
                       currentSpending > monthlyBudget
@@ -549,7 +549,7 @@ export default function BudgetPage() {
                     {spendingPercentage.toFixed(0)}%
                   </span>
                   <span
-                    className={
+                    className={ 
                       currentSpending > monthlyBudget
                         ? 'text-red-600'
                         : 'text-blue-600'
