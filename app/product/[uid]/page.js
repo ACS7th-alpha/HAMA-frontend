@@ -37,8 +37,8 @@ export default function ProductDetail() {
       const response = await fetch(`http://localhost:3008/cart/add`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           site: product.site,
@@ -49,8 +49,8 @@ export default function ProductDetail() {
           brand: product.brand,
           sale_price: product.sale_price,
           img: product.img,
-          quantity: 1 // 기본값 1로 설정
-        })
+          quantity: 1, // 기본값 1로 설정
+        }),
       });
 
       if (response.ok) {
@@ -205,7 +205,13 @@ export default function ProductDetail() {
                 >
                   장바구니 담기
                 </button>
-                {product.link && (
+              </div>
+
+
+
+
+              {/* 구매 버튼 섹션 */}
+              <div className="space-y-4">
                 <a
                   href={product.link}
                   target="_blank"
