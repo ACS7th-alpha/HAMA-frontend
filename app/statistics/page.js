@@ -69,7 +69,7 @@ export default function StatisticsPage() {
         }
 
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC__BUDGET_URL}/budget/spending`,
+          `${process.env.NEXT_PUBLIC_BACKEND_BUDGET_URL}/budget/spending`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -260,7 +260,23 @@ export default function StatisticsPage() {
     const currentMonthData = Array(daysInCurrentMonth).fill(0);
     const prevMonthData = Array(daysInPrevMonth).fill(0);
 
-    // 지출 데이터 처리
+    // 이전 달 총액을 일별로 균등 분배 (소수점 제거)
+    const prevMonthTotal = yearlyData[prevMonth] || 0;
+    const dailyAmountPrevMonth = Math.floor(prevMonthTotal / daysInPrevMonth);
+
+    // 이전 달 데이터 채우기
+    for (let i = 0; i < daysInPrevMonth; i++) {
+      prevMonthData[i] = dailyAmountPrevMonth;
+    }
+
+    // 남은 금액을 마지막 날짜에 추가 (반올림 오차 처리)
+    const remainingAmount =
+      prevMonthTotal - dailyAmountPrevMonth * daysInPrevMonth;
+    if (remainingAmount > 0) {
+      prevMonthData[daysInPrevMonth - 1] += remainingAmount;
+    }
+
+    // 현재 달 데이터 처리 (기존 로직 유지)
     spendingData.forEach((category) => {
       category.details.forEach((detail) => {
         const date = new Date(detail.date);
@@ -270,8 +286,6 @@ export default function StatisticsPage() {
 
         if (year === currentYear && month === currentMonth) {
           currentMonthData[day - 1] += detail.amount;
-        } else if (year === prevYear && month === prevMonth) {
-          prevMonthData[day - 1] += detail.amount;
         }
       });
     });
@@ -512,6 +526,12 @@ export default function StatisticsPage() {
               <>
                 {(() => {
                   const comparisonData = processMonthlyComparison(categoryData);
+                  console.log(
+                    'Previous Month Data:',
+                    yearlyData[currentDate.getMonth() - 1]
+                  ); // 디버깅용 로그
+                  console.log('Comparison Data:', comparisonData); // 디버깅용 로그
+
                   const { daysInCurrentMonth } = comparisonData;
                   const today = new Date().getDate();
                   const currentMonthSpendingToDate =

@@ -146,7 +146,7 @@ export default function MyPage() {
 
       // 회원 탈퇴 요청
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC__AUTH_URL}/auth/delete`,
+        `${process.env.NEXT_PUBLIC_BACKEND_AUTH_URL}/auth/delete`,
         {
           method: 'DELETE',
           headers: {

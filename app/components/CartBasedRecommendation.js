@@ -12,11 +12,14 @@ export default function CartBasedRecommendation() {
   const fetchCartItems = async () => {
     try {
       const accessToken = localStorage.getItem('access_token');
-      const response = await fetch(`${process.env.BACKEND_CART_URL}/cart`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_CART_URL}/cart`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
       if (!response.ok) throw new Error('장바구니 조회 실패');
 

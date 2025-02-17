@@ -126,7 +126,7 @@ export default function SignupPage() {
           const month = currentDate.getMonth() + 1; // 현재 월 (0부터 시작하므로 +1)
 
           const budgetResponse = await fetch(
-            `${process.env.NEXT_PUBLIC__BUDGET_URL}/budget`,
+            `${process.env.NEXT_PUBLIC_BACKEND_BUDGET_URL}/budget`,
             {
               method: 'POST',
               headers: {

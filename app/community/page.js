@@ -16,7 +16,7 @@ export default function CommunityPage() {
       try {
         const accessToken = localStorage.getItem('access_token'); // 액세스 토큰 가져오기
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC__REVIEW_URL}/reviews`,
+          `${process.env.NEXT_PUBLIC_BACKEND_REVIEW_URL}/reviews`,
           {
             method: 'GET',
             headers: {
