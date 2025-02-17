@@ -189,12 +189,18 @@ export default function ProductDetail() {
                 </span>
               </div>
               <div className=" rounded-2xl p-2 mb-6 mr-4">
-                <h1 className="text-2xl font-bold text-gray-800 mt-6 mb-3 mr-12">{product.name}</h1>
-                <p className="text-2xl font-bold text-black mb-4">{product.sale_price}</p>
+                <h1 className="text-2xl font-bold text-gray-800 mt-6 mb-3 mr-12">
+                  {product.name}
+                </h1>
+                <p className="text-2xl font-bold text-black mb-4">
+                  {product.sale_price}
+                </p>
                 <hr className="border-gray-200 my-4 mt-10 mr-12" />
                 <div className="grid grid-cols-[100px_auto] gap-x-4 gap-y-2 text-black text-base">
-                  <span className="font-medium">브랜드</span> <span>{product.brand}</span>              
-                  <span className="font-medium">구매처</span> <span>{product.site}</span> 
+                  <span className="font-medium">브랜드</span>{' '}
+                  <span>{product.brand}</span>
+                  <span className="font-medium">구매처</span>{' '}
+                  <span>{product.site}</span>
                 </div>
                 <hr className="border-gray-200 my-4 mr-12" />
               </div>
@@ -205,21 +211,15 @@ export default function ProductDetail() {
                 >
                   장바구니 담기
                 </button>
-              </div>
-
-
-
-
-              {/* 구매 버튼 섹션 */}
-              <div className="space-y-4">
-                <a
-                  href={product.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-36 py-3 px-4 h-12 bg-white border-2 border-orange-500 text-orange-600 hover:text-black transition-colors duration-200 text-center flex items-center justify-center"
-                >
-                  구매하러 가기
-                </a>
+                {product.link && (
+                  <a
+                    href={product.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-36 py-3 px-4 h-12 bg-white border-2 border-orange-500 text-orange-600 hover:text-black transition-colors duration-200 text-center flex items-center justify-center"
+                  >
+                    구매하러 가기
+                  </a>
                 )}
               </div>
             </div>

@@ -42,7 +42,46 @@ export default function CategoryProduct() {
     }
   }, []);
 
-  // 첫 번째 useEffect: 저장된 상태 복원
+  useEffect(() => {
+    async function fetchProducts() {
+      setLoading(true);
+      try {
+        let url;
+        if (category === '전체') {
+          url = `http://localhost:3007/products?page=${page}&limit=${limit}`;
+        } else {
+          url = `http://localhost:3007/products/category/${category}?page=${page}&limit=${limit}`;
+        }
+
+        const response = await fetch(url);
+        const data = await response.json();
+        setProducts(Array.isArray(data.data) ? data.data : []);
+        setTotalPages(Math.ceil(data.total / limit)); // Calculate total pages
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProducts();
+  }, [category, page]);
+
+  const handleCategoryClick = (categoryId) => {
+    setCategory(categoryId);
+    setPage(1); // 카테고리 변경 시 페이지 1로 리셋
+  };
+
+  // Get the current page range (5 pages per group)
+  const getPageRange = () => {
+    const startPage = Math.floor((page - 1) / 5) * 5 + 1;
+    const endPage = Math.min(startPage + 4, totalPages);
+    return { startPage, endPage };
+  };
+
+  const { startPage, endPage } = getPageRange();
+
+  // 컴포넌트 마운트 시 저장된 상태와 스크롤 위치 복원
   useEffect(() => {
     const savedPage = sessionStorage.getItem('prevPage');
     const savedCategory = sessionStorage.getItem('prevCategory');
@@ -57,6 +96,7 @@ export default function CategoryProduct() {
       sessionStorage.removeItem('prevCategory');
     }
     if (savedScrollPosition) {
+      // 약간의 지연을 주어 컨텐츠가 로드된 후 스크롤 위치를 복원
       setTimeout(() => {
         window.scrollTo(0, parseInt(savedScrollPosition));
         sessionStorage.removeItem('scrollPosition');

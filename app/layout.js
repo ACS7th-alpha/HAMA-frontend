@@ -1,6 +1,8 @@
 'use client';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import './globals.css';
+import { useEffect, useState } from 'react';
+import ChatButton from './components/ChatButton';
 
 // _app.js (또는 app/layout.js)
 import { SessionProvider } from 'next-auth/react';
@@ -20,6 +22,15 @@ import './globals.css';
 // });
 
 export default function RootLayout({ children }) {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
   // 클라이언트 ID를 직접 문자열로 입력
   const clientId =
     '140823084109-9phm7467tp421u96g73ffb4vtj4i6gg8.apps.googleusercontent.com';
@@ -33,7 +44,8 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <GoogleOAuthProvider clientId={clientId}>
-          {children}
+          <main>{children}</main>
+          {isLoggedIn && <ChatButton />}
         </GoogleOAuthProvider>
       </body>
     </html>

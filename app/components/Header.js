@@ -271,9 +271,6 @@ export default function Header({ onLogin }) {
         </div>
       </div>
 
-
-
-
       {isLoggedIn && (
         <nav className="w-full flex justify-center space-x-10 text-lg font-medium mt-10 border-b pb-2">
           <Link
