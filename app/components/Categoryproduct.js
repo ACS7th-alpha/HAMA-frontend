@@ -64,67 +64,10 @@ export default function CategoryProduct() {
     }
   }, []);
 
-  // 두 번째 useEffect: 상품 데이터 가져오기
-  useEffect(() => {
-    let isSubscribed = true; // 비동기 작업 취소를 위한 플래그
-
-    async function fetchProducts() {
-      setLoading(true);
-      try {
-        let url;
-        if (category === '전체') {
-          url = `http://localhost:3007/products?page=${page}&limit=${limit}`;
-        } else {
-          url = `http://localhost:3007/products/category/${category}?page=${page}&limit=${limit}`;
-        }
-
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (isSubscribed) {
-          setProducts(Array.isArray(data.data) ? data.data : []);
-          setTotalPages(Math.ceil(data.total / limit));
-        }
-      } catch (error) {
-        console.error('Error fetching products:', error);
-        if (isSubscribed) {
-          setProducts([]);
-        }
-      } finally {
-        if (isSubscribed) {
-          setLoading(false);
-        }
-      }
-    }
-
-    // 저장된 상태가 있을 때만 fetchProducts 실행
-    const savedPage = sessionStorage.getItem('prevPage');
-    const savedCategory = sessionStorage.getItem('prevCategory');
-
-    if (savedPage || savedCategory) {
-      fetchProducts();
-    } else if (page && category) {
-      fetchProducts();
-    }
-
-    return () => {
-      isSubscribed = false; // 컴포넌트 언마운트 시 비동기 작업 취소
-    };
-  }, [page, category, limit]);
-
-  const handleCategoryClick = (categoryId) => {
-    setCategory(categoryId);
-    setPage(1); // 카테고리 변경 시 페이지 1로 리셋
+  // 상품 클릭 핸들러 추가
+  const handleProductClick = (uid) => {
+    router.push(`/product/${uid}`);
   };
-
-  // Get the current page range (5 pages per group)
-  const getPageRange = () => {
-    const startPage = Math.floor((page - 1) / 5) * 5 + 1;
-    const endPage = Math.min(startPage + 4, totalPages);
-    return { startPage, endPage };
-  };
-
-  const { startPage, endPage } = getPageRange();
 
   return (
     <div className="min-h-screen bg-white mt-12">
@@ -175,7 +118,8 @@ export default function CategoryProduct() {
               {products.map((product) => (
                 <div
                   key={product.uid}
-                  className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border-2 border-pink-100 hover:border-pink-200"
+                  onClick={() => handleProductClick(product.uid)}
+                  className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border-2 border-pink-100 hover:border-pink-200 cursor-pointer"
                 >
                   <div className="relative group">
                     <div className="aspect-square overflow-hidden">
@@ -186,7 +130,7 @@ export default function CategoryProduct() {
                       />
                     </div>
                     <div className="absolute top-3 left-3">
-                      <span className="bg-white/90 backdrop-blur px-3 py-1 rounded-full text-l font-medium text-gray-700">
+                      <span className="bg-white/90 backdrop-blur px-3 py-1 rounded-full text-l font-medium text-gray-700 line-clamp-2">
                         {product.brand}
                       </span>
                     </div>
@@ -205,20 +149,6 @@ export default function CategoryProduct() {
                           {product.sale_price}
                         </p>
                       </div>
-                      <button
-                        onClick={() => {
-                          sessionStorage.setItem('prevPage', page.toString());
-                          sessionStorage.setItem('prevCategory', category);
-                          sessionStorage.setItem(
-                            'scrollPosition',
-                            window.scrollY.toString()
-                          );
-                          router.push(`/product/${product.uid}`);
-                        }}
-                        className="flex items-center gap-1 bg-orange-100 hover:bg-pink-200 text-orange-600 px-4 py-2 rounded-full text-xs font-medium transition-colors duration-200"
-                      >
-                        자세히 보기 <span>→</span>
-                      </button>
                     </div>
                   </div>
                 </div>

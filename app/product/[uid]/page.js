@@ -161,7 +161,7 @@ export default function ProductDetail() {
         {/* 상단 네비게이션 */}
         <button
           onClick={() => router.back()}
-          className="mb-6 text-gray-600 bg-pink-50 hover:text-pink-600 transition-colors flex items-center gap-2"
+          className="mb-6 text-gray-600 bg-white hover:text-pink-600 transition-colors flex items-center gap-2"
         >
           ← 목록으로 돌아가기
         </button>
@@ -169,8 +169,8 @@ export default function ProductDetail() {
         <div className="bg-white rounded-[2rem] shadow-lg overflow-hidden ">
           <div className="md:flex">
             {/* 이미지 섹션 */}
-            <div className="md:w-1/2 p-6">
-              <div className="aspect-square rounded-2xl overflow-hidden border-2 border-pink-200">
+            <div className="md:w-1/2 p-12">
+              <div className="aspect-square rounded-2xl overflow-hidden border-2 border-orange-200">
                 <img
                   src={product.img}
                   alt={product.name}
@@ -181,41 +181,34 @@ export default function ProductDetail() {
 
             {/* 상품 정보 섹션 */}
 
-            <div className="md:w-1/2 p-8">
+            <div className="mt-2 md:w-1/2">
               {/* 카테고리 뱃지 추가 */}
-              <div className="flex items-center gap-2 mb-4">
-                <span className="inline-block bg-pink-100 px-4 py-1 rounded-full text-sm font-medium">
+              <div className="flex items-center mt-12">
+                <span className="inline-block bg-orange-200 px-4 py-1 rounded-full text-base font-medium">
                   {categoryIcons[product.category] || '🎁'} {product.category}
                 </span>
               </div>
-              <div className=" rounded-2xl p-6 mb-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="inline-block bg-white text-pink-600 px-4 py-1 rounded-full text-sm font-medium">
-                    {product.brand}
-                  </span>
+              <div className=" rounded-2xl p-2 mb-6 mr-4">
+                <h1 className="text-2xl font-bold text-gray-800 mt-6 mb-3 mr-12">{product.name}</h1>
+                <p className="text-2xl font-bold text-black mb-4">{product.sale_price}</p>
+                <hr className="border-gray-200 my-4 mt-10 mr-12" />
+                <div className="grid grid-cols-[100px_auto] gap-x-4 gap-y-2 text-black text-base">
+                  <span className="font-medium">브랜드</span> <span>{product.brand}</span>              
+                  <span className="font-medium">구매처</span> <span>{product.site}</span> 
                 </div>
-                <h1 className="text-2xl font-bold text-gray-800 mb-3">
-                  {product.name}
-                </h1>
-                <div className="flex items-center gap-2 text-gray-500 text-sm mb-4">
-                  <span className="text-lg">🏪</span>
-                  {product.site}
-                </div>
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-lg"></span>
-                  <p className="text-2xl font-bold text-black">
-                    {product.sale_price}
-                  </p>
-                </div>
+                <hr className="border-gray-200 my-4 mr-12" />
               </div>
-              <div className="flex gap-4 mt-8">
+              <div className="flex gap-4 mt-8 mb-12 items-center ml-12">
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 bg-pink-500 text-white py-3 px-6 rounded-full hover:bg-pink-600 transition-colors duration-200"
+                  className="w-36 h-12 bg-orange-400 text-white py-3 px-4 hover:bg-orange-600 transition-colors duration-200"
                 >
                   장바구니 담기
                 </button>
               </div>
+
+
+
 
               {/* 구매 버튼 섹션 */}
               <div className="space-y-4">
@@ -223,22 +216,11 @@ export default function ProductDetail() {
                   href={product.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block w-full bg-gradient-to-r from-pink-300 to-yellow-200 text-white text-center py-4 rounded-2xl hover:from-pink-600 hover:to-purple-600 transition-all duration-300 shadow-md hover:shadow-lg font-medium text-lg"
+                  className="w-36 py-3 px-4 h-12 bg-white border-2 border-orange-500 text-orange-600 hover:text-black transition-colors duration-200 text-center flex items-center justify-center"
                 >
                   구매하러 가기
                 </a>
-
-                {/* 추가 정보 */}
-                <div className="bg-blue-50 rounded-2xl p-4 text-sm text-gray-600">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span>👶</span>
-                    <span>아기와 엄마를 위한 제품</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span>✨</span>
-                    <span>안전하고 믿을 수 있는 제품</span>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -339,7 +321,7 @@ export default function ProductDetail() {
             </div>
             {/* 장점 */}
             {product.additionalInfo.review_summary.advantages?.length > 0 && (
-              <div className="mb-8">
+              <div className="mb-8 px-12">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2 bg-green-50 p-4 rounded-xl">
                   <span className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white">
                     <span className="text-xl">👍</span>
@@ -365,7 +347,7 @@ export default function ProductDetail() {
             {/* 단점 */}
             {product.additionalInfo.review_summary.disadvantages?.length >
               0 && (
-              <div>
+              <div className="mb-8 px-12">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2 bg-red-50 p-4 rounded-xl">
                   <span className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white">
                     <span className="text-xl">👎</span>

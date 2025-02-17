@@ -59,14 +59,14 @@ export default function SearchResults() {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      <div className="container max-w-6xl mx-auto px-4 py-12">
+      <div className="container max-w-5xl mx-auto px-4 py-12">
         {/* 검색 결과 헤더 */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
           &ldquo;{keyword}&rdquo; 검색 결과
           </h1>
-          <p className="text-gray-600">
-            총 <span className="text-xl font-bold text-pink-500">{totalCount}</span>건의 상품이 있습니다
+          <p className="text-xl text-gray-600">
+            총 <span className="text-xl font-bold text-orange-500">{totalCount}</span>건의 상품이 있습니다
           </p>
         </div>
 
@@ -76,34 +76,30 @@ export default function SearchResults() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {products.map((product) => (
-                <div key={product.uid} className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
+                <Link
+                  key={product.uid}
+                  href={`/product/${product.uid}`}
+                  className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200 block"
+                >
                   <img
                     src={product.img}
                     alt={product.name}
                     className="w-full h-48 object-cover"
                   />
-                  <div className="p-4">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">
+                  <div className="px-5 py-4">
+                    <h2 className="text-base font-semibold text-gray-800 mb-1 line-clamp-2">
                       {product.name}
                     </h2>
-                    <div className="flex justify-between items-end">
-                      <div>
-                        <p className="text-sm text-gray-500 mb-1">{product.site}</p>
-                        <p className="text-xl font-bold text-black">
-                          {product.sale_price}
-                        </p>
-                      </div>
-                      <Link
-                        href={`/product/${product.uid}`}
-                        className="flex items-center gap-1 bg-orange-100 hover:bg-pink-200 text-orange-600 px-4 py-2 rounded-full text-xs font-medium transition-colors duration-200"
-                      >
-                        자세히 보기 <span>→</span>
-                      </Link>
+                    <div>
+                      <p className="text-sm text-gray-500 mb-1">{product.site}</p>
+                      <p className="text-xl font-bold text-black">
+                        {product.sale_price}
+                      </p>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
 

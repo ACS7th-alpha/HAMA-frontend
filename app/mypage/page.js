@@ -401,7 +401,7 @@ export default function MyPage() {
   return (
     <div className="min-h-screen bg-pink-0">
       <Header />
-      <div className="max-w-6xl mx-auto p-8">
+      <div className="max-w-4xl mx-auto p-8">
         {/* 프로필 헤더 */}
         <div className="bg-white rounded-3xl shadow-lg p-8 mb-8">
           <div className="flex items-center gap-8">
@@ -428,7 +428,7 @@ export default function MyPage() {
             onClick={() => setActiveTab('profile')}
             className={`px-6 py-3 rounded-full font-semibold transition-colors ${
               activeTab === 'profile'
-                ? 'bg-yellow-400 text-black'
+                ? 'bg-orange-400 text-white'
                 : 'bg-white text-gray-600 hover:bg-blue-50'
             }`}
           >
@@ -438,7 +438,7 @@ export default function MyPage() {
             onClick={() => setActiveTab('children')}
             className={`px-6 py-3 rounded-full font-semibold transition-colors ${
               activeTab === 'children'
-                ? 'bg-yellow-400 text-black'
+                ? 'bg-orange-400 text-white'
                 : 'bg-white text-gray-600 hover:bg-blue-50'
             }`}
           >
@@ -448,7 +448,7 @@ export default function MyPage() {
             onClick={() => setActiveTab('posts')}
             className={`px-6 py-3 rounded-full font-semibold transition-colors ${
               activeTab === 'posts'
-                ? 'bg-yellow-300 text-black'
+                ? 'bg-orange-400 text-white'
                 : 'bg-white text-gray-600 hover:bg-blue-50'
             }`}
           >
@@ -458,7 +458,7 @@ export default function MyPage() {
             onClick={() => setActiveTab('settings')}
             className={`px-6 py-3 rounded-full font-semibold transition-colors ${
               activeTab === 'settings'
-                ? 'bg-yellow-400 text-black'
+                ? 'bg-orange-400 text-white'
                 : 'bg-white text-gray-600 hover:bg-blue-50'
             }`}
           >
@@ -529,7 +529,7 @@ export default function MyPage() {
                 ) : (
                   <button
                     onClick={handleEditProfile}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors h-10"
+                    className="px-4 py-2 bg-orange-400 text-white rounded-md hover:bg-orange-600 transition-colors h-10"
                   >
                     수정
                   </button>
@@ -539,18 +539,18 @@ export default function MyPage() {
           )}
           {activeTab === 'children' && (
             <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6 flex justify-between items-center">
+              <h2 className="text-2xl font-bold px-4 text-gray-800 mb-6 flex justify-between items-center">
                 자녀 정보 👶
                 <button
                   onClick={handleAddChild}
-                  className="ml-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                  className="px-4 py-2 bg-orange-400 text-white text-base rounded-md hover:bg-orange-600 transition-colors"
                 >
                   추가
                 </button>
               </h2>
               {isAddingChild && ( // 추가 모드일 때 입력 필드 표시
                 <div className="rounded-2xl p-6 border-2 border-blue-100 flex justify-between items-center mb-4">
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-3 gap-6">
                     <div>
                       <p className="text-gray-600 mb-2">이름</p>
                       <input
@@ -704,7 +704,7 @@ export default function MyPage() {
                         <>
                           <button
                             onClick={() => handleEditClick(index, child.name)}
-                            className="px-4 py-2 bg-yellow-300 text-black rounded-md hover:bg-yellow-400 transition-colors"
+                            className="px-4 py-2 bg-orange-200 text-black rounded-md hover:bg-orange-400 transition-colors"
                           >
                             수정
                           </button>

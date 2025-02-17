@@ -110,13 +110,13 @@ export default function ShoppingCart() {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      <div className="container max-w-6xl mx-auto px-4 py-12">
+      <div className="container max-w-4xl mx-auto px-4 py-12">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">장바구니</h1>
           {cartItems.length > 0 && (
             <button
               onClick={handleClearCart}
-              className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-red-600 transition duration-200"
+              className="px-3 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-200"
             >
               전체 삭제
             </button>
@@ -137,14 +137,14 @@ export default function ShoppingCart() {
           <>
             <div className="space-y-4">
               {cartItems.map((item) => (
-                <div key={item.uid} className="bg-white rounded-2xl shadow-md p-6 flex items-center gap-6">
+                <div key={item.uid} className="bg-white rounded-2xl shadow-md p-5 flex items-center gap-6">
                   <img
                     src={item.img}
                     alt={item.name}
-                    className="w-24 h-24 object-cover rounded-xl"
+                    className="w-32 h-32 object-cover rounded-xl mr-3"
                   />
                   <div className="flex-1">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-2">{item.name}</h2>
+                    <h2 className="text-lg font-semibold text-gray-800 mb-1">{item.name}</h2>
                     <p className="text-sm text-gray-500 mb-1">{item.brand}</p>
                     <p className="text-xl font-bold text-black">{item.sale_price.toLocaleString()}</p>
                   </div>
@@ -156,7 +156,7 @@ export default function ShoppingCart() {
                   </button>
                   <button
                     onClick={() => handleExpenseAdd(item)}
-                    className="font-medium bg-pink-100 text-pink-600 px-4 py-2 rounded-full hover:bg-pink-200 transition-colors duration-200"
+                    className="font-medium bg-orange-400 text-white px-3 py-2 rounded-full hover:bg-orange-200 transition-colors duration-200"
                   >
                     지출 추가
                   </button>
@@ -168,7 +168,7 @@ export default function ShoppingCart() {
             {/* 🔹 총 가격 표시 추가 */}
             <div className="mt-12 border-t border-gray-300 pt-6 text-center">
               <p className="text-2xl font-semibold text-gray-800">
-                총 {cartItems.length}개 상품 금액: <span className="text-pink-500">{totalPrice.toLocaleString()}</span>
+                총 {cartItems.length}개 상품 금액: <span className="text-orange-500">{totalPrice.toLocaleString()}</span>
               </p>
             </div>
           </>

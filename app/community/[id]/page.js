@@ -1,15 +1,16 @@
 'use client';
-
 import { useState, useEffect } from 'react';
 import Header from '@/app/components/Header';
 import Link from 'next/link';
 import ItemCard from '@/app/components/ItemCard';
 import ImageSlider from '@/app/components/ImageSlider';
+import { use } from 'react'; // import use from React
 
 export default function ProductDetail({ params }) {
+  const { id } = use(params); // Unwrap the params object
+
   const [product, setProduct] = useState(null);
   const [otherProducts, setOtherProducts] = useState([]); // 다른 글 목록을 위한 state
-  const { id } = params;
 
   // 현재 상품 정보 가져오기
   useEffect(() => {
@@ -59,9 +60,9 @@ export default function ProductDetail({ params }) {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white ">
       <Header />
-      <div className="max-w-5xl mx-auto p-6 bg-white rounded-lg mt-6">
+      <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg mt-6">
         {/* 기존 상품 상세 정보 */}
         <div className="mb-4">
           {product.recommended ? (
@@ -86,7 +87,7 @@ export default function ProductDetail({ params }) {
         </div>
 
         {/* 상품 정보 */}
-        <div className="space-y-6 bg-gray-50 p-6 rounded-lg mb-16">
+        <div className="space-y-6 bg-gray-50 p-12 rounded-lg mb-16">
           <div>
             <h2 className="text-lg font-semibold mb-2">사용 연령</h2>
             <p className="text-gray-700">{product.ageGroup}</p>

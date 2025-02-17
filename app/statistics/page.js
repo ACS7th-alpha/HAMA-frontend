@@ -322,14 +322,14 @@ export default function StatisticsPage() {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      <main className="max-w-7xl mx-auto px-8 flex flex-col">
-        <div className="max-w-4xl mx-auto w-full relative">
+      <main className="max-w-5xl mx-auto px-8 flex flex-col">
+        <div className="max-w-5xl mx-auto w-full relative">
           {/* 년월 선택 부분 */}
-          <div className="flex justify-center items-center mb-8 mt-8">
+          <div className="flex justify-center items-center mt-4">
             <div className="flex items-center gap-4">
               <button
                 onClick={handlePrevMonth}
-                className="p-2 bg-white hover:bg-gray-50 rounded-full border border-gray-300 shadow-sm"
+                className="p-2 bg-white hover:bg-gray-50 rounded-full border border-gray-300"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -373,7 +373,7 @@ export default function StatisticsPage() {
           </div>
 
           {/* 도넛 차트 섹션 */}
-          <div className="bg-white rounded-lg p-6 shadow-md mt-8">
+          <div className="bg-white rounded-lg p-6 mt-8">
             <div className="flex flex-col items-center">
               <div style={{ width: '400px', height: '400px' }}>
                 <Doughnut
@@ -405,7 +405,7 @@ export default function StatisticsPage() {
           </div>
 
           {/* 카테고리별 지출 내역 */}
-          <div className="bg-white rounded-lg p-4 shadow-md mt-6 max-w-xl mx-auto">
+          <div className=" rounded-lg p-16 mt-6 border-2 max-w-4xl mx-auto">
             <h3 className="text-xl font-semibold text-black mb-2">
               카테고리별 지출 내역
             </h3>
@@ -413,11 +413,11 @@ export default function StatisticsPage() {
               <div key={index} className="mb-4">
                 {/* 카테고리 헤더 */}
                 <div className="flex justify-between items-center py-1 border-b">
-                  <div className="flex items-center gap-1">
-                    <span className="text-black text-xl font-medium">
+                  <div className="flex items-center gap-1 mb-3">
+                    <span className="relative text-black text-xl font-medium before:content-[''] before:inline-block before:w-3 before:h-3 before:bg-orange-500 before:rounded-full before:mr-2">
                       {category.name}
                     </span>
-                    <span className="text-gray-600 text-lg">
+                    <span className="ml-2 text-gray-600 text-lg">
                       {calculatePercentage(category.amount)}%
                     </span>
                   </div>
@@ -433,7 +433,7 @@ export default function StatisticsPage() {
                       key={detailIndex}
                       className="flex justify-between py-1 pl-2 text-lg border-b last:border-b-0"
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="ml-8 flex items-center gap-2">
                         <span className="text-gray-600 min-w-[60px]">
                           {new Date(detail.date).toLocaleDateString('ko-KR', {
                             month: '2-digit',
@@ -452,7 +452,7 @@ export default function StatisticsPage() {
           </div>
 
           {/* 연간 지출 내역 */}
-          <div className="bg-white rounded-lg p-6 shadow-md mt-6 max-w-4xl mx-auto">
+          <div className="bg-white rounded-lg px-20 py-12 shadow-md mt-6 max-w-4xl mx-auto">
             <h3 className="text-xl font-semibold text-black mb-4">
               {currentDate.getFullYear()}년 연간 지출 내역
             </h3>
@@ -487,12 +487,12 @@ export default function StatisticsPage() {
                 }}
               />
             </div>
-            <div className="mt-4 text-center">
-              <p className="text-gray-600">
+            <div className="mt-12 text-center">
+              <p className="text-black text-base">
                 월별 예산:{' '}
                 {Number(user?.monthlyBudget)?.toLocaleString('ko-KR')}원
               </p>
-              <p className="text-gray-600">
+              <p className="text-black text-base">
                 연간 총 지출:{' '}
                 {yearlyData.reduce((a, b) => a + b, 0).toLocaleString()}원
               </p>
@@ -500,7 +500,7 @@ export default function StatisticsPage() {
           </div>
 
           {/* 월별 비교 차트 */}
-          <div className="bg-white rounded-lg p-6 shadow-md mt-6 max-w-4xl mx-auto">
+          <div className="bg-white rounded-lg p-16 shadow-md mt-6 max-w-4xl mx-auto">
             <h3 className="text-xl font-semibold text-black mb-4">
               기간별 지출액 비교
             </h3>

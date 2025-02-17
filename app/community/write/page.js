@@ -127,7 +127,7 @@ export default function WritePage() {
   };
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen bg-white">
       <Header />
 
       <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg mt-6">
@@ -170,7 +170,7 @@ export default function WritePage() {
         <div className="flex gap-4 mb-4">
           <button
             className={`flex items-center gap-2 px-4 py-2 border rounded-lg ${
-              isRecommended === true ? 'bg-blue-600 text-white' : 'bg-gray-200'
+              isRecommended === true ? 'bg-blue-500 text-white' : 'bg-gray-200'
             }`}
             onClick={() => setIsRecommended(true)}
           >
@@ -178,7 +178,7 @@ export default function WritePage() {
           </button>
           <button
             className={`flex items-center gap-2 px-4 py-2 border rounded-lg ${
-              isRecommended === false ? 'bg-red-600 text-white' : 'bg-gray-200'
+              isRecommended === false ? 'bg-red-400 text-white' : 'bg-gray-200'
             }`}
             onClick={() => setIsRecommended(false)}
           >
@@ -226,16 +226,16 @@ export default function WritePage() {
               value={store}
               onChange={(e) => setStore(e.target.value)}
             />
+                      {/* 업로드 버튼 */}
+            <button
+              className="mt-6 px-4 bg-orange-400 text-white py-2 rounded-lg hover:bg-orange-500 ml-auto block"
+              onClick={handleSubmit}
+            >
+              업로드
+            </button>
           </div>
+      
         </div>
-
-        {/* 업로드 버튼 */}
-        <button
-          className="mt-6 w-full bg-gray-400 text-white py-2 rounded-lg hover:bg-gray-500"
-          onClick={handleSubmit}
-        >
-          업로드
-        </button>
       </div>
     </div>
   );
