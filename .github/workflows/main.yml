@@ -1,25 +1,30 @@
-name: CI-Harbor
+name: CI for Main and Test Branches
 
 on:
   push:
     branches:
-      - test  # 또는 배포할 브랜치
       - main
+      - test
 
 jobs:
   build-and-push:
-    runs-on: self-hosted  # Self-hosted runner 사용
+    runs-on: self-hosted  # self-hosted runner 사용
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install dependencies
+      - name: Build Docker image
         run: |
-          npm install
+          docker build -t hama_frontend:latest .  # Dockerfile이 있는 디렉토리에서 이미지 빌드
+          
+      - name: Run npm install inside Docker
+        run: |
+          docker run --rm hama_frontend:latest npm install  # 빌드된 이미지를 실행하여 npm install
 
-      - name: Build Next.js app
+      - name: Build Next.js app inside Docker
         run: |
-          npm run build
+          docker run --rm hama_frontend:latest npm run build  # Docker 내부에서 Next.js 빌드
 
       - name: Login to Harbor
         run: |
@@ -28,4 +33,4 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           docker build -t 192.168.2.76:443/hama/hama_frontend:latest .
-          docker push 192.168.2.76:443/hama/hama_frontend
+          docker push 192.168.2.76:443/hama/hama_frontend:latest
