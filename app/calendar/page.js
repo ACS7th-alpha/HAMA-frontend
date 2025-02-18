@@ -1,13 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Header from '@/app/components/Header';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import ko from 'date-fns/locale/ko'; // 한국어 로케일
 import { useRouter } from 'next/router';
 
-export default function CalendarPage() {
+// localStorage 안전하게 접근하는 유틸리티 함수
+const getLocalStorage = () => {
+  if (typeof window !== 'undefined') {
+    return window.localStorage;
+  }
+  return null;
+};
+
+function CalendarContent() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [monthlyBudget, setMonthlyBudget] = useState(0);
   const [allSpending, setAllSpending] = useState([]); // 전체 지출 내역 저장
@@ -29,12 +37,15 @@ export default function CalendarPage() {
     },
   ]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [localStorageData, setLocalStorageData] = useState(null);
 
   // 전체 지출 내역 조회
   useEffect(() => {
     const fetchAllSpending = async () => {
       try {
-        const accessToken = localStorage.getItem('access_token');
+        const storage = getLocalStorage();
+        const accessToken = storage ? storage.getItem('access_token') : null;
+
         if (!accessToken) {
           console.log('No access token found');
           setLoading(false);
@@ -311,7 +322,8 @@ export default function CalendarPage() {
     };
 
     try {
-      const accessToken = localStorage.getItem('access_token');
+      const storage = getLocalStorage();
+      const accessToken = storage ? storage.getItem('access_token') : null;
       if (!accessToken) {
         alert('로그인이 필요합니다.');
         return;
@@ -416,7 +428,8 @@ export default function CalendarPage() {
     }
 
     try {
-      const accessToken = localStorage.getItem('access_token');
+      const storage = getLocalStorage();
+      const accessToken = storage ? storage.getItem('access_token') : null;
       if (!accessToken) {
         alert('로그인이 필요합니다.');
         return;
@@ -487,7 +500,8 @@ export default function CalendarPage() {
     if (!confirmDelete) return;
 
     try {
-      const accessToken = localStorage.getItem('access_token');
+      const storage = getLocalStorage();
+      const accessToken = storage ? storage.getItem('access_token') : null;
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_BUDGET_URL}/budget/spending/${spendingId}`,
         {
@@ -534,7 +548,8 @@ export default function CalendarPage() {
     formData.append('file', file);
 
     try {
-      const accessToken = localStorage.getItem('access_token');
+      const storage = getLocalStorage();
+      const accessToken = storage ? storage.getItem('access_token') : null;
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_UPLOAD_URL}/analyze`,
         {
@@ -637,7 +652,13 @@ export default function CalendarPage() {
     );
   };
 
-  const user = JSON.parse(localStorage.getItem('user')); // 로컬 저장소에서 사용자 데이터 가져오기
+  const user = JSON.parse(getLocalStorage()?.getItem('user') || '{}'); // 로컬 저장소에서 사용자 데이터 가져오기
+
+  useEffect(() => {
+    // localStorage 접근은 클라이언트 사이드에서만 수행
+    const data = getLocalStorage()?.getItem('yourKey');
+    setLocalStorageData(data);
+  }, []);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -1176,3 +1197,13 @@ export default function CalendarPage() {
     </div>
   );
 }
+
+// 메인 페이지 컴포넌트
+export default function CalendarPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CalendarContent />
+    </Suspense>
+  );
+}
+

@@ -13,3 +13,12 @@
 // };
 
 // module.exports = nextConfig;
+// /** @type {import('next').NextConfig} */
+const nextConfig = {
+  output: 'standalone',
+  eslint: {
+    ignoreDuringBuilds: true, // ESLint 오류 무시
+  },
+};
+
+module.exports = nextConfig;

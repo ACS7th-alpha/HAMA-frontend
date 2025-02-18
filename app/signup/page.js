@@ -1,8 +1,9 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function SignupPage() {
+// SignupContent 컴포넌트로 useSearchParams를 사용하는 부분을 분리
+function SignupContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -288,3 +289,13 @@ export default function SignupPage() {
     </div>
   );
 }
+
+// 메인 페이지 컴포넌트
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SignupContent />
+    </Suspense>
+  );
+}
+
