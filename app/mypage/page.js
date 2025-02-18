@@ -16,7 +16,7 @@ export default function MyPage() {
     name: '',
     birthdate: '',
     gender: 'male',
-  }); // 새로운 자녀 정보 상태
+  }); // 새로운 자녀 정보
   const [isAddingChild, setIsAddingChild] = useState(false); // 추가 모드 상태
   const [isEditing, setIsEditing] = useState(false);
   const [newNickname, setNewNickname] = useState(userInfo?.nickname || '');

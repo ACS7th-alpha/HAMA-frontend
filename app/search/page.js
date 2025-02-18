@@ -1,10 +1,11 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/app/components/Header';
 
-export default function SearchResults() {
+// SearchContent 컴포넌트로 useSearchParams를 사용하는 부분을 분리
+function SearchContent() {
   const searchParams = useSearchParams();
   const keyword = searchParams.get('keyword');
   const [products, setProducts] = useState([]);
@@ -157,3 +158,13 @@ export default function SearchResults() {
     </div>
   );
 }
+
+// 메인 페이지 컴포넌트
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SearchContent />
+    </Suspense>
+  );
+}
+
