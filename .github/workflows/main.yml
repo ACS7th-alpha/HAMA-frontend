@@ -12,6 +12,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Install Node.js and npm
+        run: |
+          curl -sL https://deb.nodesource.com/setup_18.x | bash -  # Node.js 18.x 버전 설치
+          sudo apt-get install -y nodejs  # npm과 함께 설치
+
       - name: Install dependencies
         run: |
           npm install
