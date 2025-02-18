@@ -1,0 +1,30 @@
+name: CI-Harbor
+
+on:
+  push:
+    branches:
+      - test  # 또는 배포할 브랜치
+
+jobs:
+  build-and-push:
+    runs-on: self-hosted  # Self-hosted runner 사용
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          npm install
+
+      - name: Build Next.js app
+        run: |
+          npm run build
+
+      - name: Login to Harbor
+        run: |
+          docker login https://192.168.2.76:443 -u cicd_sa -p ${{ secrets.HARBOR_PASSWORD }}
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t 192.168.2.76:443/hama/hama_frontend:latest .
+          docker push 192.168.2.76:443/hama/hama_frontend
