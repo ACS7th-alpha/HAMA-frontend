@@ -17,11 +17,6 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Build frontend
-        working-directory: ./frontend # next.js 프로젝트 경로
-        run: |
-          npm install
-          npm run build
 
       - name: Login to Harbor
         run: |
@@ -30,5 +25,5 @@ jobs:
 
       - name: Build and push Docker images
         run: |
-          docker build -t ${{ secrets.HARBOR_URL }}/hama/hama_frontend:latest ./frontend
-          docker push ${{ secrets.HARBOR_URL }}/hama/hama_frontend:latest
+          docker build -t ${{ secrets.HARBOR_REGISTRY }}/hama/hama_frontend:latest ./frontend
+          docker push ${{ secrets.HARBOR_REGISTRY }}/hama/hama_frontend:latest
