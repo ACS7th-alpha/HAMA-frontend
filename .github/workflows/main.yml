@@ -25,5 +25,5 @@ jobs:
 
       - name: Build and push Docker images
         run: |
-          docker build -t ${{ secrets.HARBOR_REGISTRY }}/hama/hama_frontend:latest ./frontend
-          docker push ${{ secrets.HARBOR_REGISTRY }}/hama/hama_frontend:latest
+          docker build -t 192.168.2.76:443/hama/hama_frontend:latest ./frontend
+          docker push 192.168.2.76:443/hama/hama_frontend:latest
