@@ -20,10 +20,10 @@ jobs:
 
       - name: Login to Harbor
         run: |
-          docker login https://192.168.2.76:443 -u cicd_sa -p ${{ secrets.HARBOR_PASSWORD }}
+          docker login https://192.168.2.76:443 -u cicd_sa -p ${{ secrets.HARBOR_PASSWORD }} --insecure-registry
 
 
       - name: Build and push Docker images
         run: |
-          docker build -t 192.168.2.76:443/hama/hama_frontend:latest ./frontend
+          docker build -t 192.168.2.76:443/hama/hama_frontend:latest .
           docker push 192.168.2.76:443/hama/hama_frontend:latest
