@@ -9,27 +9,26 @@ jobs:
   build-and-push:
     runs-on: self-hosted  # Self-hosted runner 사용
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Node.js and npm
-        run: |
-          curl -sL https://deb.nodesource.com/setup_18.x | bash -  # Node.js 18.x 버전 설치
-          sudo apt-get install -y nodejs  # npm과 함께 설치
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
-      - name: Install dependencies
+      - name: Build frontend
+        working-directory: ./frontend # next.js 프로젝트 경로
         run: |
           npm install
-
-      - name: Build Next.js app
-        run: |
           npm run build
 
       - name: Login to Harbor
         run: |
           docker login https://192.168.2.76:443 -u cicd_sa -p ${{ secrets.HARBOR_PASSWORD }}
 
-      - name: Build and Push Docker Image
+
+      - name: Build and push Docker images
         run: |
-          docker build -t 192.168.2.76:443/hama/hama_frontend:latest .
-          docker push 192.168.2.76:443/hama/hama_frontend:latest
+          docker build -t ${{ secrets.HARBOR_URL }}/hama/hama_frontend:latest ./frontend
+          docker push ${{ secrets.HARBOR_URL }}/hama/hama_frontend:latest
